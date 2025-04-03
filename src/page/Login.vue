@@ -9,7 +9,7 @@
           <div class="mb-3">
             <label for="exampleInputEmail1" class="form-label">Username</label>
             <input
-              v-model="newTaiKhoan.username"
+              v-model="user.username"
               required
               type="username"
               class="form-control"
@@ -24,26 +24,18 @@
             >
             <input
               required
-              v-model="newTaiKhoan.password"
+              v-model="user.password"
               type="password"
               class="form-control"
               id="exampleInputPassword1"
             />
           </div>
           <div class="text-center">
-            <button
-              type="submit"
-              @click.prevent="dangNhap"
-              class="btn btn-primary"
-            >
+            <button @click.prevent="dangNhap" class="btn btn-primary">
               Đăng Nhập
             </button>
             |
-            <button
-              type="submit"
-              class="btn btn-primary"
-              @click.prevent="themTaiKhoan"
-            >
+            <button type="submit" class="btn btn-primary" @click="themTaiKhoan">
               Đăng ký
             </button>
           </div>
@@ -57,60 +49,26 @@
 <script setup>
 import { ref } from "vue";
 import router from "@/router/router";
+import { useToast } from "vue-toastification";
 
-const taiKhoans = ref([
-  {
-    id: 0,
-    username: "vuong",
-    password: "123",
-  },
-]);
-const newTaiKhoan = ref({
-  id: "",
+const toast = useToast();
+const userLogin = ref({
   username: "",
   password: "",
 });
+const user = ref({});
 
-const reset = () => {
-  newTaiKhoan.value = {
-    id: "",
-    username: "",
-    password: "",
-  };
-};
-
-const themTaiKhoan = () => {
-  const existingAccount = taiKhoans.value.find(
-    (t) => t.username === newTaiKhoan.value.username
-  );
-
-  if (existingAccount) {
-    alert("Tài khoản đã tồn tại. Vui lòng đăng nhập!");
-  } else {
-    // Thêm tài khoản mới vào danh sách
-    taiKhoans.value.push({
-      id: taiKhoans.value.length + 1,
-      ...newTaiKhoan.value,
-    });
-    alert("Tạo tài khoản thành công! Xin mời đăng nhập.");
-    reset();
-    router.push("/taiKhoan");
-  }
-};
-
-// Đănnhập
-const dangNhap = () => {
-  const account = taiKhoans.value.find(
-    (t) =>
-      t.username === newTaiKhoan.value.username &&
-      t.password === newTaiKhoan.value.password
-  );
-
-  if (account) {
-    alert("Đăng nhập thành công!");
-    router.push("/home");
-  } else {
-    alert("Username hoặc password không đúng");
+const dangNhap = async () => {
+  try {
+    const res = await post("http://localhost:8080/auth/login", userLogin.value);
+    const token = res.data;
+    localStorage.setItem("token", token);
+    console.log("token là:", token);
+    console.log(res.data);
+    toast.success("Đăng nhập thành công!");
+  } catch {
+    toast.error("Đăng nhập thâtts bại!");
+    console.log("Lỗi đăng nhập");
   }
 };
 </script>

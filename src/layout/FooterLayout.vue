@@ -2,17 +2,12 @@
   <div class="container-fluid bg-dark text-light py-4">
     <div class="row">
       <div class="col-md-3 ps-5">
-        <img
-          src="../img/tayCamLogo.jpg"
-          alt="Logo Shop"
-          width="150"
-          class="mb-3"
-        />
+        <img src="../img/logo.png" alt="Logo Shop" width="150" class="mb-3" />
         <p>
           <a
             href="#"
             class="ps-3 fs-8 link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"
-            >procontroller.com</a
+            >Maylocnuoc.com</a
           >
         </p>
 

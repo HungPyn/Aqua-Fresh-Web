@@ -1,6 +1,6 @@
 <template>
   <div class="container-fluid" style="background-color: aliceblue">
-    <br /><br />
+    <br />
     <div class="container-sm container-md container-lg container-xl">
       <!-- Carousel -->
       <div
@@ -11,21 +11,21 @@
         <div class="carousel-inner">
           <div class="carousel-item active" data-bs-interval="2000">
             <img
-              src="https://i.imgur.com/U2Mxo0s.jpeg"
+              src="https:////i.imgur.com/Z6q48Zh.jpeg"
               class="d-block w-100"
               alt="Xbox"
             />
           </div>
           <div class="carousel-item">
             <img
-              src="https://i.imgur.com/qZVQFJZ.png"
+              src="https://i.imgur.com/kkbakbV.jpeg"
               class="d-block w-100"
               alt="PlayStation"
             />
           </div>
           <div class="carousel-item">
             <img
-              src="https://i.imgur.com/99nRJlt.png"
+              src="https://i.imgur.com/r9VyNeR.jpeg"
               class="d-block w-100"
               alt="Nintendo"
             />
@@ -145,12 +145,12 @@
                 </div>
               </div>
             </div>
-            <div id="xbox">
+            <div id="tuDung">
               <br /><br />
               <h1
                 class="text-center fw-semibold text-uppercase mt-3 text-secondary"
               >
-                Xbox Series
+                Máy lọc nước tủ đứng
               </h1>
               <hr />
               <div class="row g-2">
@@ -221,12 +221,12 @@
                 </div>
               </div>
             </div>
-            <div id="ps">
+            <div id="deBan">
               <br /><br />
               <h1
                 class="text-center fw-semibold text-uppercase mt-3 text-secondary"
               >
-                Playtation Series
+                Máy lọc nước để bàn
               </h1>
               <hr />
               <div class="row g-2">
@@ -297,12 +297,12 @@
                 </div>
               </div>
             </div>
-            <div id="nitendo">
+            <div id="amBon">
               <br /><br />
               <h1
                 class="text-center fw-semibold text-uppercase mt-3 text-secondary"
               >
-                Nitendo Series
+                Máy lọc nước âm bồn
               </h1>
               <hr />
               <div class="row g-2">

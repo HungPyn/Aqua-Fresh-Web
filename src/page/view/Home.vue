@@ -33,19 +33,19 @@
               </router-link>
             </li>
             <li class="nav-item">
-              <router-link class="nav-link fw-bold fs-6" to="/home#xbox">
-                Xbox
+              <router-link class="nav-link fw-bold fs-6" to="/home#tuDung">
+                Tủ đứng
               </router-link>
             </li>
             <li class="nav-item">
-              <router-link class="nav-link fw-bold fs-6" to="/home#ps">
-                PlayStation
+              <router-link class="nav-link fw-bold fs-6" to="/home#deBan">
+                Để bàn
               </router-link>
             </li>
 
             <li class="nav-item">
-              <router-link class="nav-link fw-bold fs-6" to="/home#nitendo">
-                Nintendo Switch
+              <router-link class="nav-link fw-bold fs-6" to="/home#amBon">
+                Âm bồn
               </router-link>
             </li>
           </ul>
@@ -63,17 +63,6 @@
 
           <!-- Biểu tượng giỏ hàng và yêu thích bên phải -->
           <ul class="navbar-nav ms-auto d-flex align-items-center">
-            <li class="nav-item">
-              <router-link to="/whishlist">
-                <img
-                  src="../../img/iconwhishlist.png"
-                  alt="Wishlist"
-                  width="30"
-                  height="27"
-                  class="d-inline-block align-text-top"
-                />
-              </router-link>
-            </li>
             <li class="nav-item ms-3 position-relative">
               <router-link to="/gioHang">
                 <img
