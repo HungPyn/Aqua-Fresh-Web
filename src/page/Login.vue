@@ -66,6 +66,7 @@ const dangNhap = async () => {
     console.log("token là:", token);
     console.log(res.data);
     toast.success("Đăng nhập thành công!");
+    router.push("/");
   } catch {
     toast.error("Đăng nhập thâtts bại!");
     console.log("Lỗi đăng nhập");

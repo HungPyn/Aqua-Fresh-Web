@@ -69,16 +69,18 @@
         <ul class="list-unstyled">
           <li class="mb-2">
             <a href="#" class="text-light text-decoration-none"
-              >Tay cầm Playtation</a
+              >Máy lọc nước RO</a
             >
-          </li>
-          <li class="mb-2">
-            <a href="#" class="text-light text-decoration-none">Tay cầm Xbox</a>
           </li>
           <li class="mb-2">
             <a href="#" class="text-light text-decoration-none"
-              >Nitendo switch</a
+              >Máy lọc nước Nano</a
             >
+          </li>
+          <li class="mb-2">
+            <a href="#" class="text-light text-decoration-none"
+              >Máy lọc nước điện giải</a
+            >z
           </li>
         </ul>
       </div>
