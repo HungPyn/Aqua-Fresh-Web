@@ -611,51 +611,20 @@ const categorys = ref([]);
 const products = ref([]);
 const getProduct = async () => {
   try {
-    const res = await axios.get("http://localhost:8080/products/hien-thi");
-    console.log(res.data);
+    const res = await axios.get("http://localhost:8080/product");
+    console.log("list prodduct", res.data);
     products.value = res.data;
   } catch (error) {
     console.error("Lỗi khi gọi product:", error);
   }
 };
 
-//lấy category
-const getCategory = async () => {
-  try {
-    const res = await axios.get(
-      "http://localhost:8080/products/hien-thi/category"
-    );
-    console.log(res.data);
-    categorys.value = res.data;
-  } catch (error) {
-    console.error("Lỗi khi gọi category:", error);
-  }
-};
 // mua hàng
 const muaHang = async (pd) => {};
 
 //fakse user
 const userId = "894de7e6-12c8-4387-94ad-05396cca268d";
 //thêm giỏ hàng
-const themVaoGio = async (pd) => {
-  const gioHang = {
-    user: { id: userId }, // Lồng userId vào object
-    product: { id: pd.id }, // Lồng pd.id vào object
-    price: pd.price,
-    quantity: 1,
-    createdAt: new Date().toISOString().split("T")[0],
-  };
-  console.log("Giỏ hàng trước khi gửi:", gioHang);
-  try {
-    const res = await axios.post("http://localhost:8080/cart/add", gioHang);
-    console.log(res.data);
-    toast.success("Đã thêm vào giỏ hàng");
-  } catch (error) {
-    console.error("Lỗi:", error.response ? error.response.data : error);
-    console.error("Lỗi chi tiết:", error.response.data);
-    toast.error("Thêm thất bại");
-  }
-};
 
 onMounted(() => {
   getCategory();

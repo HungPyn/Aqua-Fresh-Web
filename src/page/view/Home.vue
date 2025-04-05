@@ -77,12 +77,23 @@
                   soLuongGioHang
                 }}</span>
               </router-link>
+              <router-link
+                v-show="isLogin"
+                class="nav-link fw-bold fs-6"
+                to="/login"
+                style="text-decoration: none; color: black"
+              >
+                <div v-show="isLogin">
+                  <h6><a>Đăng nhập</a></h6>
+                </div></router-link
+              >
             </li>
           </ul>
         </div>
       </div>
     </nav>
-    <router-view></router-view>
+    <Controllers />
+
     <div>
       <!-- Nút liên hệ Zalo và Facebook -->
       <div class="contact-button">
@@ -114,6 +125,9 @@
 
 <script setup>
 import { ref } from "vue";
+import Controllers from "./Controllers.vue";
+
+const isLogin = localStorage.getItem("isLogin") ? true : false;
 
 const soLuongGioHang = ref(0);
 </script>

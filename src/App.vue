@@ -1,8 +1,7 @@
 <template>
   <div>
     <HeaderLayout />
-    <div><Login /></div>
-
+    <Home />
     <br /><br /><br /><br />
     <hr />
     <FooterLayout />

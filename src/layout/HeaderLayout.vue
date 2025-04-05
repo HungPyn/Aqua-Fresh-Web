@@ -16,7 +16,7 @@
             height="40"
             class="d-inline-block align-text-top me-2"
           />
-          maylocnuoc.com
+          Aquafresh.com
         </a>
 
         <!-- Form tìm kiếm bên phải -->

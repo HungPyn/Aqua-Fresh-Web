@@ -9,10 +9,14 @@ import HoaDonAdmin from "@/page/viewAdmin/HoaDonAdmin.vue";
 import ProductAdmin from "@/page/viewAdmin/ProductAdmin.vue";
 import UserAdmin from "@/page/viewAdmin/UserAdmin.vue";
 import ProductDetail from "@/components/ProductDetail.vue";
+import HomeAdmin from "@/page/viewAdmin/HomeAdmin.vue";
+import Login from "@/page/Login.vue";
 
 const routes = [
   { path: "/", redirect: "/home" }, // Chuyển hướng mặc định
   { path: "/home", name: "home", component: Controllers },
+  { path: "/homeAdmin", name: "homeAdmin", component: HomeAdmin },
+  { path: "/login", name: "login", component: Login },
   { path: "/discount", name: "discount", component: Discount },
   { path: "/gioHang", name: "gioHang", component: GioHang },
   { path: "/whishlist", name: "whishlist", component: Whisthlist },
