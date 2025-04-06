@@ -53,12 +53,13 @@
           <!-- Ô tìm kiếm căn giữa -->
           <form class="d-flex mx-auto w-50">
             <input
+              @keydown.enter.prevent="timKiem()"
+              v-model="noiDung"
               class="form-control me-2"
               type="search"
               placeholder="Tìm kiếm..."
               aria-label="Search"
             />
-            <button class="btn btn-dark" type="submit">Search</button>
           </form>
 
           <!-- Biểu tượng giỏ hàng và yêu thích bên phải -->
@@ -92,7 +93,7 @@
         </div>
       </div>
     </nav>
-    <Controllers />
+    <router-view></router-view>
 
     <div>
       <!-- Nút liên hệ Zalo và Facebook -->
@@ -126,8 +127,19 @@
 <script setup>
 import { ref } from "vue";
 import Controllers from "./Controllers.vue";
+import { useRouter } from "vue-router"; // Import useRouter
 
+const router = useRouter(); // Sử dụng useRouter để lấy đối tượng router
 const isLogin = localStorage.getItem("isLogin") ? true : false;
+
+const noiDung = ref("");
+const timKiem = () => {
+  if (noiDung.value.trim()) {
+    if (router.currentRoute.name !== "timKiem") {
+      router.push({ name: "timKiem", query: { q: noiDung.value } });
+    }
+  }
+};
 
 const soLuongGioHang = ref(0);
 </script>

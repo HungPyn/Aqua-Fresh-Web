@@ -127,7 +127,7 @@
             >{{ Number(tongCong).toLocaleString("vi-VN") }} vnđ</b
           >
         </h4>
-        <button @click="thanhToan" class="btn btn-success mt-2">
+        <button @click="thanhToan" class="btn btn-success mt-2 rounded-0">
           💳 Thanh toán
         </button>
       </div>

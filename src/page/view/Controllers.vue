@@ -1,5 +1,5 @@
 <template>
-  <div class="container-fluid" style="background-color: aliceblue">
+  <div class="container-fluid">
     <br />
     <div class="container-sm container-md container-lg container-xl">
       <!-- Carousel -->
@@ -34,493 +34,86 @@
       </div>
     </div>
     <br />
-    <div class="container-fluid px-5">
+    <div class="container">
       <div class="row">
-        <div class="col-lg-2" style="margin-top: 300px">
-          <h5 class="mb-3 text-start">Bộ lọc</h5>
-          <div class="mb-3">
-            <input
-              class="form-control"
-              placeholder="Tên sản phẩm.."
-              v-model="duLieu"
-              @keyup.enter="timKiem"
-              @input="timKiem"
-            />
-          </div>
-
-          <div class="mb-3">
-            <label for="vaiTro" class="form-label text-start">Danh mục</label>
-            <select class="form-control" @change="timKiem" v-model="danhMuc">
-              <option value="">Tất cả</option>
-              <option v-for="ct in categorys" :key="ct.id" :value="ct.id">
-                {{ ct.name }}
-              </option>
-            </select>
-          </div>
-          <div class="mb-3">
-            <label for="vaiTro" class="form-label text-start">Giá</label>
-            <select class="form-control" @change="setGia" v-model="gia">
-              <option value="">Tất cả</option>
-              <option value="0">Dưới 3 triệu</option>
-              <option value="1">3 triệu - 7 triệu</option>
-              <option value="2">Trên 7 triệu</option>
-            </select>
-          </div>
-        </div>
-        <div class="col-8">
-          <div v-show="!isSearch">
-            <div>
-              <br /><br />
-              <h1
-                class="text-center fw-semibold text-uppercase mt-3 text-secondary"
-              >
-                Nổi Bật
-              </h1>
-              <hr />
-              <div class="row g-2">
-                <div
-                  v-for="pd in products.filter((p) => p.category.id === 1)"
-                  :key="pd.id"
-                  class="col-12 col-md-3 mb-4"
-                >
-                  <div
-                    class="card d-flex flex-column shadow-sm hover-effect"
-                    style="min-height: 370px"
-                  >
-                    <router-link
-                      :to="'/productDetail/' + pd.id"
-                      class="text-decoration-none text-dark"
-                    >
-                      <!-- Hình ảnh -->
-                      <img
-                        :src="pd.image"
-                        class="img-fluid"
-                        style="
-                          width: 100%;
-                          aspect-ratio: 16 / 9;
-                          object-fit: cover;
-                        "
-                      />
-                    </router-link>
-
-                    <!-- Nội dung card -->
-                    <div class="card-body d-flex flex-column">
-                      <router-link
-                        :to="'/productDetail/' + pd.id"
-                        class="text-decoration-none text-dark"
-                      >
-                        <h6 class="card-title text-center fs-6">
-                          {{ truncateText(pd.name, 34) }}
-                        </h6>
-
-                        <p class="card-text fs-6">
-                          <small> {{ truncateText(pd.description, 93) }}</small>
-                        </p>
-                      </router-link>
-                      <!-- Phần giá và button luôn nằm dưới cùng -->
-                      <div class="mt-auto">
-                        <div style="min-height: 30px">
-                          <b style="color: red">
-                            {{ Number(pd.price).toLocaleString("vi-VN") }} vnđ
-                          </b>
-                        </div>
-
-                        <div class="d-flex justify-content-between">
-                          <button
-                            @click.stop="themVaoGio(pd)"
-                            class="btn btn-success btn-sm"
-                          >
-                            Thêm vào giỏ
-                          </button>
-                          <button
-                            @click.stop="muaHang(pd)"
-                            class="btn btn-danger btn-sm"
-                          >
-                            Mua
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div id="tuDung">
-              <br /><br />
-              <h1
-                class="text-center fw-semibold text-uppercase mt-3 text-secondary"
-              >
-                Máy lọc nước tủ đứng
-              </h1>
-              <hr />
-              <div class="row g-2">
-                <div
-                  v-for="pd in products.filter((p) => p.category.id === 1)"
-                  :key="pd.id"
-                  class="col-12 col-md-3 mb-4"
-                >
-                  <div
-                    class="card d-flex flex-column shadow-sm hover-effect"
-                    style="min-height: 370px"
-                  >
-                    <router-link
-                      :to="'/productDetail/' + pd.id"
-                      class="text-decoration-none text-dark"
-                    >
-                      <!-- Hình ảnh -->
-                      <img
-                        :src="pd.image"
-                        class="img-fluid"
-                        style="
-                          width: 100%;
-                          aspect-ratio: 16 / 9;
-                          object-fit: cover;
-                        "
-                      />
-                    </router-link>
-
-                    <!-- Nội dung card -->
-                    <div class="card-body d-flex flex-column">
-                      <router-link
-                        :to="'/productDetail/' + pd.id"
-                        class="text-decoration-none text-dark"
-                      >
-                        <h6 class="card-title text-center fs-6">
-                          {{ truncateText(pd.name, 34) }}
-                        </h6>
-
-                        <p class="card-text fs-6">
-                          <small> {{ truncateText(pd.description, 93) }}</small>
-                        </p>
-                      </router-link>
-                      <!-- Phần giá và button luôn nằm dưới cùng -->
-                      <div class="mt-auto">
-                        <div style="min-height: 30px">
-                          <b style="color: red">
-                            {{ Number(pd.price).toLocaleString("vi-VN") }} vnđ
-                          </b>
-                        </div>
-
-                        <div class="d-flex justify-content-between">
-                          <button
-                            @click.stop="themVaoGio(pd)"
-                            class="btn btn-success btn-sm"
-                          >
-                            Thêm vào giỏ
-                          </button>
-                          <button
-                            @click.stop="muaHang(pd)"
-                            class="btn btn-danger btn-sm"
-                          >
-                            Mua
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div id="deBan">
-              <br /><br />
-              <h1
-                class="text-center fw-semibold text-uppercase mt-3 text-secondary"
-              >
-                Máy lọc nước để bàn
-              </h1>
-              <hr />
-              <div class="row g-2">
-                <div
-                  v-for="pd in products.filter((p) => p.category.id === 2)"
-                  :key="pd.id"
-                  class="col-12 col-md-3 mb-4"
-                >
-                  <div
-                    class="card d-flex flex-column shadow-sm hover-effect"
-                    style="min-height: 370px"
-                  >
-                    <router-link
-                      :to="'/productDetail/' + pd.id"
-                      class="text-decoration-none text-dark"
-                    >
-                      <!-- Hình ảnh -->
-                      <img
-                        :src="pd.image"
-                        class="img-fluid"
-                        style="
-                          width: 100%;
-                          aspect-ratio: 16 / 9;
-                          object-fit: cover;
-                        "
-                      />
-                    </router-link>
-
-                    <!-- Nội dung card -->
-                    <div class="card-body d-flex flex-column">
-                      <router-link
-                        :to="'/productDetail/' + pd.id"
-                        class="text-decoration-none text-dark"
-                      >
-                        <h6 class="card-title text-center fs-6">
-                          {{ truncateText(pd.name, 34) }}
-                        </h6>
-
-                        <p class="card-text fs-6">
-                          <small> {{ truncateText(pd.description, 93) }}</small>
-                        </p>
-                      </router-link>
-                      <!-- Phần giá và button luôn nằm dưới cùng -->
-                      <div class="mt-auto">
-                        <div style="min-height: 30px">
-                          <b style="color: red">
-                            {{ Number(pd.price).toLocaleString("vi-VN") }} vnđ
-                          </b>
-                        </div>
-
-                        <div class="d-flex justify-content-between">
-                          <button
-                            @click.stop="themVaoGio(pd)"
-                            class="btn btn-success btn-sm"
-                          >
-                            Thêm vào giỏ
-                          </button>
-                          <button
-                            @click.stop="muaHang(pd)"
-                            class="btn btn-danger btn-sm"
-                          >
-                            Mua
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div id="amBon">
-              <br /><br />
-              <h1
-                class="text-center fw-semibold text-uppercase mt-3 text-secondary"
-              >
-                Máy lọc nước âm bồn
-              </h1>
-              <hr />
-              <div class="row g-2">
-                <div
-                  v-for="pd in products.filter((p) => p.category.id === 3)"
-                  :key="pd.id"
-                  class="col-12 col-md-3 mb-4"
-                >
-                  <div
-                    class="card d-flex flex-column shadow-sm hover-effect"
-                    style="min-height: 370px"
-                  >
-                    <router-link
-                      :to="'/productDetail/' + pd.id"
-                      class="text-decoration-none text-dark"
-                    >
-                      <!-- Hình ảnh -->
-                      <img
-                        :src="pd.image"
-                        class="img-fluid"
-                        style="
-                          width: 100%;
-                          aspect-ratio: 16 / 9;
-                          object-fit: cover;
-                        "
-                      />
-                    </router-link>
-
-                    <!-- Nội dung card -->
-                    <div class="card-body d-flex flex-column">
-                      <router-link
-                        :to="'/productDetail/' + pd.id"
-                        class="text-decoration-none text-dark"
-                      >
-                        <h6 class="card-title text-center fs-6">
-                          {{ truncateText(pd.name, 34) }}
-                        </h6>
-
-                        <p class="card-text fs-6">
-                          <small> {{ truncateText(pd.description, 93) }}</small>
-                        </p>
-                      </router-link>
-                      <!-- Phần giá và button luôn nằm dưới cùng -->
-                      <div class="mt-auto">
-                        <div style="min-height: 30px">
-                          <b style="color: red">
-                            {{ Number(pd.price).toLocaleString("vi-VN") }} vnđ
-                          </b>
-                        </div>
-
-                        <div class="d-flex justify-content-between">
-                          <button
-                            @click.stop="themVaoGio(pd)"
-                            class="btn btn-success btn-sm"
-                          >
-                            Thêm vào giỏ
-                          </button>
-                          <button
-                            @click.stop="muaHang(pd)"
-                            class="btn btn-danger btn-sm"
-                          >
-                            Mua
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div v-show="isSearch">
-            <br />
-            <br />
-            <div class="row g-2">
-              <div
-                v-for="pd in productsearch"
-                :key="pd.id"
-                class="col-12 col-md-3 mb-4"
-              >
-                <div
-                  class="card d-flex flex-column shadow-sm hover-effect"
-                  style="min-height: 370px"
-                >
-                  <router-link
-                    :to="'/productDetail/' + pd.id"
-                    class="text-decoration-none text-dark"
-                  >
-                    <!-- Hình ảnh -->
-                    <img
-                      :src="pd.image"
-                      class="img-fluid"
-                      style="
-                        width: 100%;
-                        aspect-ratio: 16 / 9;
-                        object-fit: cover;
-                      "
-                    />
-                  </router-link>
-
-                  <!-- Nội dung card -->
-                  <div class="card-body d-flex flex-column">
-                    <router-link
-                      :to="'/productDetail/' + pd.id"
-                      class="text-decoration-none text-dark"
-                    >
-                      <h6 class="card-title text-center fs-6">
-                        {{ truncateText(pd.name, 34) }}
-                      </h6>
-
-                      <p class="card-text fs-6">
-                        <small> {{ truncateText(pd.description, 93) }}</small>
-                      </p>
-                    </router-link>
-                    <!-- Phần giá và button luôn nằm dưới cùng -->
-                    <div class="mt-auto">
-                      <div style="min-height: 30px">
-                        <b style="color: red">
-                          {{ Number(pd.price).toLocaleString("vi-VN") }} vnđ
-                        </b>
-                      </div>
-
-                      <div class="d-flex justify-content-between">
-                        <button
-                          @click.stop="themVaoGio(pd)"
-                          class="btn btn-success btn-sm"
-                        >
-                          Thêm vào giỏ
-                        </button>
-                        <button
-                          @click.stop="muaHang(pd)"
-                          class="btn btn-danger btn-sm"
-                        >
-                          Mua
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+        <div id="tuDung">
+          <br /><br />
+          <h1
+            class="text-center fw-semibold text-uppercase mt-3 text-secondary"
+          >
+            Tủ đứng
+          </h1>
+          <hr />
+          <div class="row g-5">
             <div
-              v-if="productsearch.length == 0"
-              class="d-flex justify-content-center align-items-center"
+              v-for="pd in productFull.filter(
+                (pd) => pd.idProduct.idCategory.id === 1
+              )"
+              :key="pd.id"
+              class="col-12 col-md-3 mb-4"
             >
-              <h4 class="text-center text-danger">Không tìm thấy sản phẩm</h4>
-            </div>
-          </div>
-          <div id="tatCa">
-            <br /><br />
-            <h1
-              class="text-center fw-semibold text-uppercase mt-3 text-secondary"
-            >
-              Tất cả sản phẩm
-            </h1>
-            <hr />
-            <div class="row g-2">
               <div
-                v-for="pd in products"
-                :key="pd.id"
-                class="col-12 col-md-3 mb-4"
+                class="card d-flex flex-column shadow-sm hover-effect product-card"
+                style="min-height: 330px"
               >
-                <div
-                  class="card d-flex flex-column shadow-sm hover-effect"
-                  style="min-height: 370px"
+                <router-link
+                  :to="'/productDetail/' + pd.id"
+                  class="text-decoration-none text-dark"
                 >
+                  <!-- Hình ảnh -->
+                  <img
+                    :src="pd.images[0]"
+                    class="img-fluid"
+                    style="height: 260px; margin: 10px"
+                  />
+                </router-link>
+
+                <!-- Nội dung card -->
+                <div class="card-body d-flex flex-column">
                   <router-link
                     :to="'/productDetail/' + pd.id"
                     class="text-decoration-none text-dark"
                   >
-                    <!-- Hình ảnh -->
-                    <img
-                      :src="pd.image"
-                      class="img-fluid"
-                      style="
-                        width: 100%;
-                        aspect-ratio: 16 / 9;
-                        object-fit: cover;
-                      "
-                    />
+                    <h6 class="card-title fs-6">
+                      {{ truncateText(pd.idProduct.productName, 85) }}
+                    </h6>
                   </router-link>
-
-                  <!-- Nội dung card -->
-                  <div class="card-body d-flex flex-column">
-                    <router-link
-                      :to="'/productDetail/' + pd.id"
-                      class="text-decoration-none text-dark"
-                    >
-                      <h6 class="card-title text-center fs-6">
-                        {{ truncateText(pd.name, 34) }}
-                      </h6>
-
-                      <p class="card-text fs-6">
-                        <small> {{ truncateText(pd.description, 93) }}</small>
-                      </p>
-                    </router-link>
-                    <!-- Phần giá và button luôn nằm dưới cùng -->
-                    <div class="mt-auto">
-                      <div style="min-height: 30px">
-                        <b style="color: red">
+                  <!-- Phần giá và button luôn nằm dưới cùng -->
+                  <div class="mt-auto">
+                    <div style="min-height: 30px">
+                      <div v-if="pd.idDiscount.discountValue > 0">
+                        <b
+                          style="color: gray"
+                          class="text-decoration-line-through"
+                        >
                           {{ Number(pd.price).toLocaleString("vi-VN") }} vnđ
                         </b>
+                        <b style="color: red">
+                          {{
+                            Number(
+                              pd.price - pd.idDiscount.discountValue
+                            ).toLocaleString("vi-VN")
+                          }}
+                          vnđ
+                        </b>
                       </div>
+                      <div v-if="pd.idDiscount.discountValue == 0">
+                        <b style="color: red">
+                          {{ Number(pd.price).toLocaleString("vi-VN") }}
+                          vnđ
+                        </b>
+                      </div>
+                    </div>
 
-                      <div class="d-flex justify-content-between">
-                        <button
-                          @click.stop="themVaoGio(pd)"
-                          class="btn btn-success btn-sm"
-                        >
-                          Thêm vào giỏ
-                        </button>
-                        <button
-                          @click.stop="muaHang(pd)"
-                          class="btn btn-danger btn-sm"
-                        >
-                          Mua
-                        </button>
-                      </div>
+                    <div
+                      class="d-flex justify-content-center mt-1 add-to-cart-overlay"
+                    >
+                      <button
+                        @click.stop="themVaoGio(pd)"
+                        class="btn btn-success btn-sm"
+                      >
+                        Thêm vào giỏ
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -528,9 +121,262 @@
             </div>
           </div>
         </div>
+        <div id="deBan">
+          <br /><br />
+          <h1
+            class="text-center fw-semibold text-uppercase mt-3 text-secondary"
+          >
+            Để bàn
+          </h1>
+          <hr />
+          <div class="row g-5">
+            <div
+              v-for="pd in productFull.filter(
+                (pd) => pd.idProduct.idCategory.id === 2
+              )"
+              :key="pd.id"
+              class="col-12 col-md-3 mb-4"
+            >
+              <div
+                class="card d-flex flex-column shadow-sm hover-effect product-card"
+                style="min-height: 330px"
+              >
+                <router-link
+                  :to="'/productDetail/' + pd.id"
+                  class="text-decoration-none text-dark"
+                >
+                  <!-- Hình ảnh -->
+                  <img
+                    :src="pd.images[0]"
+                    class="img-fluid"
+                    style="height: 260px; margin: 10px"
+                  />
+                </router-link>
 
-        <div class="col-2"></div>
+                <!-- Nội dung card -->
+                <div class="card-body d-flex flex-column">
+                  <router-link
+                    :to="'/productDetail/' + pd.id"
+                    class="text-decoration-none text-dark"
+                  >
+                    <h6 class="card-title fs-6">
+                      {{ truncateText(pd.idProduct.productName, 85) }}
+                    </h6>
+                  </router-link>
+                  <!-- Phần giá và button luôn nằm dưới cùng -->
+                  <div class="mt-auto">
+                    <div style="min-height: 30px">
+                      <div v-if="pd.idDiscount.discountValue > 0">
+                        <b
+                          style="color: gray"
+                          class="text-decoration-line-through"
+                        >
+                          {{ Number(pd.price).toLocaleString("vi-VN") }} vnđ
+                        </b>
+                        <b style="color: red">
+                          {{
+                            Number(
+                              pd.price - pd.idDiscount.discountValue
+                            ).toLocaleString("vi-VN")
+                          }}
+                          vnđ
+                        </b>
+                      </div>
+                      <div v-if="pd.idDiscount.discountValue == 0">
+                        <b style="color: red">
+                          {{ Number(pd.price).toLocaleString("vi-VN") }}
+                          vnđ
+                        </b>
+                      </div>
+                    </div>
+
+                    <div
+                      class="d-flex justify-content-center mt-1 add-to-cart-overlay"
+                    >
+                      <button
+                        @click.stop="themVaoGio(pd)"
+                        class="btn btn-success btn-sm"
+                      >
+                        Thêm vào giỏ
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div id="amBon">
+          <br /><br />
+          <h1
+            class="text-center fw-semibold text-uppercase mt-3 text-secondary"
+          >
+            Âm bồn
+          </h1>
+          <hr />
+          <div class="row g-5">
+            <div
+              v-for="pd in productFull.filter(
+                (pd) => pd.idProduct.idCategory.id === 3
+              )"
+              :key="pd.id"
+              class="col-12 col-md-3 mb-4"
+            >
+              <div
+                class="card d-flex flex-column shadow-sm hover-effect product-card"
+                style="min-height: 330px"
+              >
+                <router-link
+                  :to="'/productDetail/' + pd.id"
+                  class="text-decoration-none text-dark"
+                >
+                  <!-- Hình ảnh -->
+                  <img
+                    :src="pd.images[0]"
+                    class="img-fluid"
+                    style="height: 260px; margin: 10px"
+                  />
+                </router-link>
+
+                <!-- Nội dung card -->
+                <div class="card-body d-flex flex-column">
+                  <router-link
+                    :to="'/productDetail/' + pd.id"
+                    class="text-decoration-none text-dark"
+                  >
+                    <h6 class="card-title fs-6">
+                      {{ truncateText(pd.idProduct.productName, 85) }}
+                    </h6>
+                  </router-link>
+                  <!-- Phần giá và button luôn nằm dưới cùng -->
+                  <div class="mt-auto">
+                    <div style="min-height: 30px">
+                      <div v-if="pd.idDiscount.discountValue > 0">
+                        <b
+                          style="color: gray"
+                          class="text-decoration-line-through"
+                        >
+                          {{ Number(pd.price).toLocaleString("vi-VN") }} vnđ
+                        </b>
+                        <b style="color: red">
+                          {{
+                            Number(
+                              pd.price - pd.idDiscount.discountValue
+                            ).toLocaleString("vi-VN")
+                          }}
+                          vnđ
+                        </b>
+                      </div>
+                      <div v-if="pd.idDiscount.discountValue == 0">
+                        <b style="color: red">
+                          {{ Number(pd.price).toLocaleString("vi-VN") }}
+                          vnđ
+                        </b>
+                      </div>
+                    </div>
+
+                    <div
+                      class="d-flex justify-content-center mt-1 add-to-cart-overlay"
+                    >
+                      <button
+                        @click.stop="themVaoGio(pd)"
+                        class="btn btn-success btn-sm"
+                      >
+                        Thêm vào giỏ
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div id="tatCa">
+          <br /><br />
+          <h1
+            class="text-center fw-semibold text-uppercase mt-3 text-secondary"
+          >
+            Tất cả sản phẩm
+          </h1>
+          <hr />
+          <div class="row g-5">
+            <div
+              v-for="pd in productFull"
+              :key="pd.id"
+              class="col-12 col-md-3 mb-4"
+            >
+              <div
+                class="card d-flex flex-column shadow-sm hover-effect product-card"
+                style="min-height: 330px"
+              >
+                <router-link
+                  :to="'/productDetail/' + pd.id"
+                  class="text-decoration-none text-dark"
+                >
+                  <!-- Hình ảnh -->
+                  <img
+                    :src="pd.images[0]"
+                    class="img-fluid"
+                    style="height: 260px; margin: 10px"
+                  />
+                </router-link>
+
+                <!-- Nội dung card -->
+                <div class="card-body d-flex flex-column">
+                  <router-link
+                    :to="'/productDetail/' + pd.id"
+                    class="text-decoration-none text-dark"
+                  >
+                    <h6 class="card-title fs-6">
+                      {{ truncateText(pd.idProduct.productName, 85) }}
+                    </h6>
+                  </router-link>
+                  <!-- Phần giá và button luôn nằm dưới cùng -->
+                  <div class="mt-auto">
+                    <div style="min-height: 30px">
+                      <div v-if="pd.idDiscount.discountValue > 0">
+                        <b
+                          style="color: gray"
+                          class="text-decoration-line-through"
+                        >
+                          {{ Number(pd.price).toLocaleString("vi-VN") }} vnđ
+                        </b>
+                        <b style="color: red">
+                          {{
+                            Number(
+                              pd.price - pd.idDiscount.discountValue
+                            ).toLocaleString("vi-VN")
+                          }}
+                          vnđ
+                        </b>
+                      </div>
+                      <div v-if="pd.idDiscount.discountValue == 0">
+                        <b style="color: red">
+                          {{ Number(pd.price).toLocaleString("vi-VN") }}
+                          vnđ
+                        </b>
+                      </div>
+                    </div>
+
+                    <div
+                      class="d-flex justify-content-center mt-1 add-to-cart-overlay"
+                    >
+                      <button
+                        @click.stop="themVaoGio(pd)"
+                        class="btn btn-success btn-sm"
+                      >
+                        Thêm vào giỏ
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
+
+      <div class="col-2"></div>
     </div>
   </div>
 </template>
@@ -540,84 +386,60 @@ import { ref, onMounted } from "vue";
 import axios from "axios";
 import { useToast } from "vue-toastification";
 import Swal from "sweetalert2";
-
 const toast = useToast();
-
-//tim kiếm
-const duLieu = ref("");
-const danhMuc = ref("");
-const soLuong = ref("");
-const gia = ref("");
-const gia1 = ref("");
-const gia2 = ref("");
-const setGia = () => {
-  if (gia.value === "0") {
-    gia1.value = "0";
-    gia2.value = "3000000";
-  } else if (gia.value === "1") {
-    gia1.value = "3000000";
-    gia2.value = "7000000";
-  } else if (gia.value === "2") {
-    gia1.value = "7000000";
-    gia2.value = "100000000";
-  } else {
-    gia1.value = "";
-    gia2.value = "";
-  }
-  timKiem();
-};
-const timKiem = () => {
-  if (
-    !duLieu.value &&
-    !danhMuc.value &&
-    !soLuong.value &&
-    !gia.value &&
-    !gia1.value &&
-    !gia2.value
-  ) {
-    isSearch.value = false;
-  } else {
-    isSearch.value = true;
-    timKiem1();
-  }
-};
-const productsearch = ref([]);
-const isSearch = ref(false);
-const timKiem1 = async () => {
-  try {
-    const res = await axios("http://localhost:8080/products/search", {
-      params: {
-        duLieu: duLieu.value,
-        danhMuc: danhMuc.value,
-        gia1: gia1.value,
-        gia2: gia2.value,
-        soLuong: soLuong.value,
-      },
-    });
-    console.log(res.data);
-    productsearch.value = res.data;
-  } catch (error) {
-    console.error("Lỗi khi tim product", error);
-  }
-};
 
 const truncateText = (text, maxLength) => {
   if (!text) return "";
   return text.length > maxLength ? text.substring(0, maxLength) + "..." : text;
 };
 
-const categorys = ref([]);
-
-const products = ref([]);
-const getProduct = async () => {
+//get ảnh
+const getImage = async () => {
   try {
-    const res = await axios.get("http://localhost:8080/product");
-    console.log("list prodduct", res.data);
-    products.value = res.data;
+    const response = await axios.get("http://localhost:8080/product/picture");
+    images.value = response.data;
   } catch (error) {
-    console.error("Lỗi khi gọi product:", error);
+    console.error("Lỗi lấy ảnh:", error);
   }
 };
+//getproduct
+const getProduct = async () => {
+  try {
+    const response = await axios.get("http://localhost:8080/product");
+    productNoImage.value = response.data;
+  } catch (error) {
+    console.error("Lỗi lấy product", error);
+  }
+};
+//ghép product full dữ liệu
+const images = ref([]);
+const productNoImage = ref([]);
+const productFull = ref([]);
+const getFullProduct = () => {
+  productNoImage.value.forEach((product) => {
+    // Tìm các ảnh có idproduct trùng với id của sản phẩm
+    const productImages = images.value
+      .filter((image) => image.idProductDetail.id === product.id)
+      .map((image) => image.urlImage);
+
+    // Ghép thông tin sản phẩm và các ảnh vào productFull
+    productFull.value.push({
+      ...product, // Thêm thông tin của sản phẩm
+      images: productImages, // Thêm các ảnh tương ứng
+    });
+  });
+};
+onMounted(() => {
+  // Lấy ảnh và sản phẩm đồng thời
+  Promise.all([getImage(), getProduct()])
+    .then(() => {
+      // Sau khi cả hai đều xong, gọi hàm ghép dữ liệu
+      getFullProduct();
+    })
+    .catch((error) => {
+      console.error("Lỗi khi tải dữ liệu:", error);
+    });
+});
 
 // mua hàng
 const muaHang = async (pd) => {};
@@ -625,12 +447,8 @@ const muaHang = async (pd) => {};
 //fakse user
 const userId = "894de7e6-12c8-4387-94ad-05396cca268d";
 //thêm giỏ hàng
-
-onMounted(() => {
-  getCategory();
-  getProduct();
-});
 </script>
+
 <style scoped>
 #carouselExample {
   width: 100%; /* Thay đổi chiều rộng của carousel */
@@ -680,5 +498,23 @@ button {
   transform: scale(1.07);
   transition: transform 0.2s ease-in-out;
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+}
+.product-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.add-to-cart-overlay {
+  position: absolute;
+  bottom: 15px;
+  left: 75%;
+  transform: translateX(-50%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  width: 75%;
+}
+
+.product-card:hover .add-to-cart-overlay {
+  opacity: 1;
 }
 </style>

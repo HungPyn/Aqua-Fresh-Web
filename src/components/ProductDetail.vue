@@ -1,31 +1,88 @@
 <template>
-  <div class="containe-fluid" style="background-color: #fffafa">
+  <div class="containe-fluid">
     <br /><br />
     <div class="container">
       <div class="row">
-        <!-- Hình ảnh sản phẩm -->
-        <div class="col-md-5">
+        <div class="col-md-5 mb-3">
           <img
-            :src="product.image"
+            :src="selectedImage"
             class="img-fluid rounded shadow-sm"
             alt="Product Image"
           />
+          <!-- Ảnh nhỏ phía dưới -->
+          <div class="col-12 d-flex flex-wrap gap-2">
+            <img
+              v-for="(img, index) in product.images"
+              :key="index"
+              :src="img"
+              class="img-thumbnail"
+              style="
+                width: 80px;
+                height: 80px;
+                cursor: pointer;
+                object-fit: cover;
+              "
+              @click="checkImg(index)"
+              :class="{
+                'border border-primary border-2': selectedImage === img,
+              }"
+              alt="Thumbnail"
+            />
+          </div>
         </div>
 
         <!-- Thông tin sản phẩm -->
         <div class="col-md-7">
-          <h1 class="fw-bold">{{ product.name }}</h1>
-          <h3 class="text-danger fw-bold">
-            {{
-              product.price
-                ? product.price.toLocaleString() + " VNĐ"
-                : "Đang cập nhật"
-            }}
-          </h3>
+          <h3 class="fw-bold">{{ product.idProduct.productName }}</h3>
+          <br />
+
+          <div v-if="product.idDiscount.discountValue === 0">
+            <h3 class="text-danger fw-bold">
+              {{
+                product.price
+                  ? product.price.toLocaleString() + " VNĐ"
+                  : "Đang cập nhật"
+              }}
+            </h3>
+          </div>
+          <div
+            v-if="product.idDiscount.discountValue > 0"
+            class="d-flex align-items-center gap-2"
+          >
+            <h3
+              style="color: gray"
+              class="text-muted text-decoration-line-through"
+            >
+              {{
+                product.price
+                  ? product.price.toLocaleString() + " VNĐ"
+                  : "Đang cập nhật"
+              }}
+            </h3>
+
+            <h3 class="text-danger fw-bold">
+              {{
+                product.price
+                  ? (
+                      product.price - product.idDiscount.discountValue
+                    ).toLocaleString() + " VNĐ"
+                  : "Đang cập nhật"
+              }}
+            </h3>
+          </div>
+
           <p class="text-muted">
-            Số lượng: {{ product.quantity ?? "Không có sẵn" }}
+            Số lượng: <b>{{ product.quantity ?? "Không có sẵn" }}</b>
           </p>
-          <p>{{ product.description }}</p>
+          <p>
+            Công nghệ: <b>{{ product.idTechnology.name }}</b>
+          </p>
+          <p>
+            Màu sắc: <b>{{ product.idColor.name }}</b>
+          </p>
+          <p>
+            Thương hiệu: <b>{{ product.idProduct.idCompany.name }}</b>
+          </p>
 
           <!-- Nút hành động -->
           <div class="container mt-4">
@@ -56,25 +113,34 @@
               </div>
 
               <!-- Nút thêm vào giỏ -->
-              <button class="btn btn-success flex-grow-1" @click="themVaoGio">
-                🛒 Thêm vào giỏ
-              </button>
             </div>
-
+            <br />
             <!-- Dòng thứ hai: Nút Mua Ngay và Yêu Thích, căn cách đều -->
             <div class="d-flex justify-content-between">
-              <button class="btn btn-danger flex-grow-1 me-2" @click="mua">
-                Mua Ngay
+              <button
+                class="btn btn-danger flex-grow-1 me-2 rounded-0"
+                @click="mua"
+              >
+                Mua
               </button>
               <button
-                class="btn btn-outline-danger flex-grow-1"
-                @click="themVaoYeuThich"
+                class="btn btn-success flex-grow-1 rounded-0"
+                @click="themVaoGio"
               >
-                ❤️ Yêu thích
+                🛒 Thêm vào giỏ
               </button>
             </div>
           </div>
         </div>
+        <br />
+        <hr />
+        <div>
+          <h5 class="fw-bold">Thông tin sản phẩm</h5>
+          <p class="card-text fs-5">
+            {{ product.description }}
+          </p>
+        </div>
+
         <div class="container mt-4">
           <h5 class="fw-bold">Đánh giá {{ product.name }}</h5>
 
@@ -109,8 +175,11 @@
       <div class="row g-2">
         <h5 class="fw-semibold mt-3 text-secondary">Các sản phẩm tương tự</h5>
         <div
-          v-for="pd in products
-            .filter((p) => p.category.id === cate)
+          v-for="pd in productFull
+            .filter(
+              (pd) =>
+                pd.idProduct.idCategory.id == product.idProduct.idCategory.id
+            )
             .sort(() => Math.random() - 0.5)
             .slice(0, 4)"
           :key="pd.id"
@@ -126,9 +195,9 @@
             >
               <!-- Hình ảnh -->
               <img
-                :src="pd.image"
+                :src="pd.images[0]"
                 class="img-fluid"
-                style="width: 100%; aspect-ratio: 16 / 9; object-fit: cover"
+                style="height: 260px; margin: 10px"
               />
             </router-link>
 
@@ -138,20 +207,38 @@
                 :to="'/productDetail/' + pd.id"
                 class="text-decoration-none text-dark hover-effect"
               >
-                <h6 class="card-title text-center fs-6">
-                  {{ truncateText(pd.name, 34) }}
+                <h6 class="card-title fs-6">
+                  <b>{{ truncateText(pd.idProduct.productName, 99) }}</b>
                 </h6>
-
-                <p class="card-text fs-6">
-                  <small> {{ truncateText(pd.description, 245) }}</small>
-                </p>
               </router-link>
 
               <!-- Giá sản phẩm -->
-              <div class="mt-auto text-center">
-                <b style="color: red">
+              <div class="mt-auto">
+                <b style="color: red" v-if="pd.idDiscount.discountValue === 0">
                   {{ Number(pd.price).toLocaleString("vi-VN") }} vnđ
                 </b>
+                <div v-if="pd.idDiscount.discountValue > 0">
+                  <b
+                    style="color: gray"
+                    class="text-muted text-decoration-line-through"
+                  >
+                    {{
+                      pd.price
+                        ? pd.price.toLocaleString() + " VNĐ"
+                        : "Đang cập nhật"
+                    }}
+                  </b>
+
+                  <b3 style="color: red" class="fw-bold">
+                    {{
+                      pd.price
+                        ? (
+                            pd.price - pd.idDiscount.discountValue
+                          ).toLocaleString() + " VNĐ"
+                        : "Đang cập nhật"
+                    }}
+                  </b3>
+                </div>
               </div>
             </div>
           </div>
@@ -167,9 +254,7 @@ import { useToast } from "vue-toastification";
 import Swal from "sweetalert2";
 import router from "@/router/router";
 import { useRouter } from "vue-router";
-
 const toast = useToast();
-
 //soluong
 const soLuong = ref(1);
 const tangSoLuong = () => {
@@ -182,88 +267,133 @@ const giamSoLuong = () => {
     soLuong.value--;
   }
 };
-// category tương tự
-const cate = ref(1);
+
+const product = ref({
+  id: 3,
+  idProduct: {
+    id: 1,
+    productName:
+      "Compact Pulsator Washer for Clothes, .9 Cubic ft. Tub, White, BPAB10WH 9 Cubic ft. Tub, White, BPAB10WH 9 Cubic ft. Tub, White, BPAB10WH 9 Cubic ft. Tub, âsdsBPAB10WH",
+    idCategory: {
+      id: 1,
+      name: "Để bàn",
+      status: true,
+    },
+    idCompany: {
+      id: 1,
+      name: "kanggaru",
+      status: false,
+    },
+    status: false,
+  },
+  price: 200000,
+  quantity: 234,
+  idColor: {
+    id: 1,
+    name: "Xanh",
+    status: false,
+  },
+  idTechnology: {
+    id: 1,
+    name: "Dinner",
+    status: true,
+  },
+  description:
+    "Máy lọc nước [Tên sản phẩm] là giải pháp lý tưởng để đảm bảo nguồn nước sạch cho gia đình bạn. Với công nghệ lọc tiên tiến, máy có khả năng loại bỏ tạp chất, vi khuẩn và các chất độc hại trong nước, mang đến nguồn nước trong lành, an toàn cho sức khỏe. Sản phẩm được trang bị hệ thống lọc nhiều cấp, giúp loại bỏ cặn bẩn, clo, kim loại nặng và các chất gây ô nhiễm khác. Máy sử dụng công nghệ RO (Reverse Osmosis) giúp loại bỏ các chất độc hại, mang đến nguồn nước tinh khiết. Thiết kế tiết kiệm điện, giúp giảm chi phí vận hành, với dung tích lớn thích hợp cho gia ",
+  idDiscount: {
+    id: 1,
+    discountName: "HESOI25",
+    discountValue: 6000,
+    startDate: "2025-06-01",
+    endDate: "2025-06-30",
+    description: "Giảm giá đặc biệt mùa hè",
+    active: true,
+  },
+  status: true,
+  images: [
+    "https://i.imgur.com/p1lHdLo.jpeg",
+    "https://i.imgur.com/ho3P7PU.jpeg",
+    "https://i.imgur.com/p1lHdLo.jpeg",
+  ],
+});
+
+//ảnh
+const selectedImage = ref(product.value.images[0]);
+const checkImg = (index) => {
+  selectedImage.value = product.value.images[index];
+};
 
 //// mua
 const mua = () => {};
 // them vao gio
 //fakse user
 const userId = "894de7e6-12c8-4387-94ad-05396cca268d";
-const themVaoGio = async () => {
-  const gioHang = {
-    user: { id: userId },
-    product: { id: product.value.id },
-    price: product.value.price,
-    quantity: soLuong.value,
-    createdAt: new Date().toISOString().split("T")[0],
-  };
-  console.log("Giỏ hàng trước khi gửi:", gioHang);
-  try {
-    const res = await axios.post("http://localhost:8080/cart/add", gioHang);
-    console.log(res.data);
-    toast.success("Đã thêm vào giỏ hàng");
-  } catch (error) {
-    console.error("Lỗi:", error.response ? error.response.data : error);
-
-    toast.error("Thêm thất bại");
-  }
-};
-//themVaoYeuThich
-const themVaoYeuThich = () => {};
-
-const truncateText = (text, maxLength) => {
-  if (!text) return "";
-  return text.length > maxLength ? text.substring(0, maxLength) + "..." : text;
-};
-
-const product = ref({});
-const products = ref([]);
-const getProduct = async () => {
-  try {
-    const res = await axios.get("http://localhost:8080/products/hien-thi");
-    console.log(res.data);
-    products.value = res.data;
-  } catch (error) {
-    console.error("Lỗi khi gọi product:", error);
-  }
-};
 
 const props = defineProps(["id"]);
 const getOneProduct = async () => {
   try {
     const res = await axios.get(
-      "http://localhost:8080/products/get-product/" + props.id
+      "http://localhost:8080/admin/products/" + props.id
     );
     console.log(res.data);
     product.value = res.data;
-    cate.value = product.value.category?.id || 1;
+    console.log(product.value);
   } catch (error) {
     console.error("Lỗi khi gọi 1 product:", error);
   }
 };
+//sản phảm tương tự
+//get ảnh
+const truncateText = (text, maxLength) => {
+  if (!text) return "";
+  return text.length > maxLength ? text.substring(0, maxLength) + "..." : text;
+};
+const getImage = async () => {
+  try {
+    const response = await axios.get("http://localhost:8080/product/picture");
+    images.value = response.data;
+  } catch (error) {
+    console.error("Lỗi lấy ảnh:", error);
+  }
+};
+//getproduct
+const getProduct = async () => {
+  try {
+    const response = await axios.get("http://localhost:8080/product");
+    productNoImage.value = response.data;
+  } catch (error) {
+    console.error("Lỗi lấy product", error);
+  }
+};
+//ghép product full dữ liệu
+const images = ref([]);
+const productNoImage = ref([]);
+const productFull = ref([]);
+const getFullProduct = () => {
+  productNoImage.value.forEach((product) => {
+    // Tìm các ảnh có idproduct trùng với id của sản phẩm
+    const productImages = images.value
+      .filter((image) => image.idProductDetail.id === product.id)
+      .map((image) => image.urlImage);
+
+    // Ghép thông tin sản phẩm và các ảnh vào productFull
+    productFull.value.push({
+      ...product, // Thêm thông tin của sản phẩm
+      images: productImages, // Thêm các ảnh tương ứng
+    });
+  });
+};
 
 onMounted(() => {
-  getProduct();
-  getOneProduct();
+  Promise.all([getImage(), getProduct()])
+    .then(() => {
+      // Sau khi cả hai đều xong, gọi hàm ghép dữ liệu
+      getFullProduct();
+    })
+    .catch((error) => {
+      console.error("Lỗi khi tải dữ liệu:", error);
+    });
 });
-watch(
-  () => props.id,
-  () => {
-    getOneProduct(); // Khi ID thay đổi, lấy sản phẩm mới
-  }
-);
+watch();
 </script>
-<style scoped>
-img {
-  max-width: 100%;
-  border-radius: 8px;
-}
-.hover-effect {
-  color: black; /* Giữ màu đen */
-}
-
-.hover-effect:hover h6 {
-  text-decoration: underline;
-}
-</style>
+<style scoped></style>
