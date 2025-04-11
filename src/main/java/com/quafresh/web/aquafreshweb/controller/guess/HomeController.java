@@ -52,7 +52,7 @@ public class HomeController {
 
     @GetMapping("/search")
     public ResponseEntity<List<ProductDetailGuessDTO>> search(
-            @RequestParam(required = false) Integer technologyId,
+            @RequestParam(required = false) Integer technologyId,   
             @RequestParam(required = false) String productName,
             @RequestParam(required = false) BigDecimal priceFrom,
             @RequestParam(required = false) BigDecimal priceTo
