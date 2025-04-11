@@ -7,9 +7,15 @@
     <div class="row mb-4">
       <div class="col-12 col-md-6 col-lg-2 mb-3">
         <b for="technologyId" class="form-label">Công nghệ</b>
-        <select class="form-control text-center">
-          <option value="">Chọn công nghệ(chưa có api)</option>
-          <option></option>
+        <select
+          v-model="technologyId"
+          @change="timKiem"
+          class="form-control text-center"
+        >
+          <option :value="tech.id" v-for="tech in technology" :key="tech.id">
+            {{ tech.name }}
+          </option>
+          <option value="">Tất cả</option>
         </select>
       </div>
       <div class="col-12 col-md-6 col-lg-2 mb-3">
@@ -102,6 +108,10 @@ const truncateText = (text, maxLength) => {
 };
 
 const timKiem = async () => {
+  console.log("Nội dung:", noiDung.value);
+  console.log("Technology ID:", technologyId.value);
+  console.log("Giá từ:", priceFrom.value);
+  console.log("Giá đến:", priceTo.value);
   try {
     console.log("Tên sản phẩm tìm kiếm:", noiDung.value);
     const response = await axios.get("http://localhost:8080/product/search", {
@@ -113,9 +123,20 @@ const timKiem = async () => {
       },
     });
     productFull.value = response.data;
-    console.log("Dữ liệu tìm kiếm:", productFull.value);
   } catch (error) {
     console.error("Lõi tim kiem:", error);
+  }
+};
+const technology = ref([]);
+const getTechnology = async () => {
+  try {
+    const response = await axios.get(
+      "http://localhost:8080/product/technology"
+    );
+    technology.value = response.data;
+    console.log("Dữ liệu technology:", technology.value);
+  } catch (error) {
+    console.error("Lõi get technology:", error);
   }
 };
 
@@ -128,5 +149,6 @@ watch(
 );
 onMounted(() => {
   timKiem();
+  getTechnology();
 });
 </script>

@@ -1,7 +1,7 @@
 <template>
   <div class="container-fluid">
     <div class="container mt-5">
-      <h1 class="text-center mb-4">🛒 Giỏ hàng của bạn</h1>
+      <h1 class="text-center mb-4">Giỏ hàng</h1>
 
       <!-- Thông báo nếu giỏ hàng trống -->
       <div v-if="cart.length === 0" class="alert alert-info text-center">
@@ -33,8 +33,9 @@
           <!-- Hình ảnh sản phẩm -->
           <div class="col-md-2 text-center">
             <img
-              :src="item.product.image"
+              :src="item.idProductDetail.listUrl[0].urlImage"
               class="img-fluid rounded"
+              style="width: 70%; height: auto"
               alt="Product Image"
             />
           </div>
@@ -42,34 +43,81 @@
           <!-- Thông tin sản phẩm -->
           <div class="col-md-4">
             <router-link
-              :to="'/productDetail/' + item.product.id"
+              :to="'/productDetail/' + item.idProductDetail.id"
               class="text-decoration-none text-dark hover-effect"
               style="
                 padding: 0 !important; /* Loại bỏ padding nếu không cần thiết */
                 margin: 0 !important; /* Loại bỏ margin nếu không cần thiết */
                 display: inline-block; /* Đảm bảo phần tử chỉ chiếm diện tích cần thiết */
               "
-              ><h5 class="card-title mb-1">
-                {{ item.product.name }}
-              </h5></router-link
+              ><h6 class="card-title mb-1">
+                {{ item.idProductDetail.idProduct.productName }}
+              </h6></router-link
             >
 
             <p class="card-text mb-0">
               <strong>Giá: </strong>
-              <b class="text-danger"
-                >{{ Number(item.price).toLocaleString("vi-VN") }} vnđ</b
+
+              <b
+                v-if="item.idProductDetail.idDiscount.discountValue > 0"
+                class="text-muted text-decoration-line-through"
+                >{{
+                  Number(item.idProductDetail.price).toLocaleString("vi-VN")
+                }}đ
+              </b>
+              <b
+                v-if="item.idProductDetail.idDiscount.discountValue > 0"
+                class="text-danger"
+                >{{
+                  Number(
+                    item.idProductDetail.price -
+                      item.idProductDetail.idDiscount.discountValue
+                  ).toLocaleString("vi-VN")
+                }}đ</b
               >
+
+              <b
+                v-if="item.idProductDetail.idDiscount.discountValue === 0"
+                class="text-danger"
+                >{{
+                  Number(item.idProductDetail.price).toLocaleString("vi-VN")
+                }}
+                đ</b
+              >
+            </p>
+            <br />
+            <p class="card-text mb-0" style="font-size: 0.8rem">
+              <b>Ngày thêm: </b
+              >{{
+                new Date(item.dateAdded).toLocaleString("vi-VN", {
+                  hour12: false,
+                })
+              }}
             </p>
           </div>
 
           <!-- Hiển thị tổng tiền của từng sản phẩm -->
           <div class="col-md-2 text-center">
             <b> Tổng: </b>
-            <b class="text-danger"
+            <b
+              class="text-danger"
+              v-if="item.idProductDetail.idDiscount.discountValue === 0"
               >{{
-                Number(item.price * item.quantity).toLocaleString("vi-VN")
-              }}
-              vnđ</b
+                Number(
+                  item.idProductDetail.price * item.quantity
+                ).toLocaleString("vi-VN")
+              }}đ</b
+            >
+            <b
+              class="text-danger"
+              v-if="item.idProductDetail.idDiscount.discountValue > 0"
+              >{{
+                Number(
+                  (item.idProductDetail.price -
+                    item.idProductDetail.idDiscount.discountValue) *
+                    item.quantity
+                ).toLocaleString("vi-VN")
+              }}đ</b
             >
           </div>
 
@@ -79,7 +127,7 @@
               <button
                 class="btn btn-outline-secondary"
                 type="button"
-                @click="giamSoLuong(item)"
+                @click.stop="giamSoLuong(item)"
                 @mouseleave="updateSoLuong(item)"
               >
                 -
@@ -93,7 +141,7 @@
               <button
                 class="btn btn-outline-secondary"
                 type="button"
-                @click="tangSoLuong(item)"
+                @click.stop="tangSoLuong(item)"
                 @mouseleave="updateSoLuong(item)"
               >
                 +
@@ -103,8 +151,11 @@
 
           <!-- Nút xóa -->
           <div class="col-md-1 text-center">
-            <button class="btn btn-sm btn-danger" @click="xoaGioHang(item.id)">
-              🗑️ Xóa
+            <button
+              class="btn btn-sm btn-danger rounded-0"
+              @click="xoaGioHang(item)"
+            >
+              Xóa
             </button>
           </div>
         </div>
@@ -124,12 +175,48 @@
         <h4>
           Tổng cộng:
           <b class="text-danger"
-            >{{ Number(tongCong).toLocaleString("vi-VN") }} vnđ</b
+            >{{ Number(tongCong).toLocaleString("vi-VN") }}đ</b
           >
         </h4>
-        <button @click="thanhToan" class="btn btn-success mt-2 rounded-0">
-          💳 Thanh toán
+        <button
+          @click="thanhToan"
+          data-bs-toggle="modal"
+          data-bs-target="#modalThanhToan"
+          class="btn btn-success mt-2 rounded-0"
+        >
+          Thanh toán
         </button>
+      </div>
+    </div>
+
+    <!-- Modal Thanh Toán -->
+    <div class="modal fade" id="modalThanhToan" tabindex="-1">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Xác nhận thanh toán</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+            ></button>
+          </div>
+
+          <div class="modal-body">
+            <p>Bạn có chắc muốn thanh toán các sản phẩm đã chọn?</p>
+          </div>
+
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Hủy
+            </button>
+            <button type="button" class="btn btn-primary">Xác nhận</button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -151,10 +238,12 @@ watch(chonTatCa, (newVal) => {
     chonSanPham.value = []; // Bỏ chọn tất cả sản phẩm
   }
 });
-//chon sanpham khi click vaof div
+//chon sanpham khi click vao div
 const select = (gh) => {
   // Kiểm tra xem sản phẩm đã có trong chonSanPham chưa
-  const index = chonSanPham.value.findIndex((item) => item.id === gh.id);
+  const index = chonSanPham.value.findIndex(
+    (item) => item.idProductDetail.id === gh.idProductDetail.id
+  );
 
   if (index !== -1) {
     // Nếu sản phẩm đã có, xóa nó khỏi chonSanPham
@@ -176,76 +265,123 @@ const giamSoLuong = (gh) => {
   }
 };
 const updateSoLuong = async (gh) => {
-  const gioHang = {
-    id: gh.id,
-    user: gh.user,
-    product: gh.product,
-    price: gh.price,
-    quantity: gh.quantity,
-    createdAt: gh.createdAt,
-    quantity: gh.quantity,
-  };
-  console.log(
-    "Dữ liệu gior hangf trước khi gửi:",
-    JSON.stringify(gioHang, null, 2)
-  );
-  try {
-    const res = await axios.put("http://localhost:8080/cart/update", gioHang);
-    console.log(res.data);
-    getCart();
-  } catch (error) {
-    console.error("Lỗi:", error.response ? error.response.data : error);
+  if (isLogin.value) {
+    // const gioHang = {
+    //   id: gh.id,
+    //   user: gh.user,
+    //   product: gh.product,
+    //   price: gh.price,
+    //   quantity: gh.quantity,
+    //   createdAt: gh.createdAt,
+    //   quantity: gh.quantity,
+    // };
+    // console.log(
+    //   "Dữ liệu gior hangf trước khi gửi:",
+    //   JSON.stringify(gioHang, null, 2)
+    // );
+    // try {
+    //   const res = await axios.put("http://localhost:8080/cart/update", gioHang);
+    //   console.log(res.data);
+    //   getCart();
+    // } catch (error) {
+    //   console.error("Lỗi:", error.response ? error.response.data : error);
+    // }
+  } else {
+    const sessionCart = JSON.parse(sessionStorage.getItem("cart")) || [];
+    const index = sessionCart.findIndex(
+      (item) => item.idProductDetail.id === gh.idProductDetail.id
+    );
+    if (index !== -1) {
+      sessionCart[index].quantity = gh.quantity;
+      sessionStorage.setItem("cart", JSON.stringify(sessionCart));
+    }
   }
 };
-
 const cart = ref([]);
-//fakse id user
+
 const userId = "894de7e6-12c8-4387-94ad-05396cca268d";
+//chek usser
+const getUserFromSession = () => {
+  const storedUser = sessionStorage.getItem("user");
+  user.value = storedUser ? JSON.parse(storedUser) : null;
+};
+const user = ref(null);
+const isLogin = computed(() => !!user.value);
+//lấy ra giỏ hàng
 
 const getCart = async () => {
-  try {
-    const res = await axios.get(
-      "http://localhost:8080/cart/hien-thi/" + userId
-    );
-    console.log(res.data);
-    cart.value = res.data;
-  } catch (error) {
-    console.error("Lỗi:", error.response ? error.response.data : error);
+  if (isLogin.value) {
+  } else {
+    const sessionCart = JSON.parse(sessionStorage.getItem("cart")) || [];
+    cart.value = sessionCart;
   }
 };
 //xóa
-const xoaGioHang = async (id) => {
-  Swal.fire({
-    title: "Bạn có muốn xóa không?",
-    icon: "warning",
-    showCancelButton: true,
-    confirmButtonText: "Có",
-    cancelButtonText: "Không",
-  }).then(async (result) => {
-    // Cần async ở đây vì có await bên trong
-    if (result.isConfirmed) {
-      try {
-        await axios.delete(`http://localhost:8080/cart/delete/${id}`);
-        getCart();
-      } catch (error) {
-        console.error("Lỗi:", error.response ? error.response.data : error);
+const xoaGioHang = async (gh) => {
+  if (isLogin.value) {
+    // Swal.fire({
+    //   title: "Bạn có muốn xóa không?",
+    //   icon: "warning",
+    //   showCancelButton: true,
+    //   confirmButtonText: "Có",
+    //   cancelButtonText: "Không",
+    // }).then(async (result) => {
+    //   // Cần async ở đây vì có await bên trong
+    //   if (result.isConfirmed) {
+    //     try {
+    //       await axios.delete(`http://localhost:8080/cart/delete/${id}`);
+    //       getCart();
+    //     } catch (error) {
+    //       console.error("Lỗi:", error.response ? error.response.data : error);
+    //     }
+    //   }
+    // });
+  } else {
+    Swal.fire({
+      title: "Bạn có muốn xóa không?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Có",
+      cancelButtonText: "Không",
+    }).then(async (result) => {
+      // Cần async ở đây vì có await bên trong
+      if (result.isConfirmed) {
+        const sessionCart = JSON.parse(sessionStorage.getItem("cart")) || [];
+        const index = sessionCart.findIndex(
+          (item) => item.idProductDetail.id === gh.idProductDetail.id
+        );
+        if (index !== -1) {
+          sessionCart.splice(index, 1); // Xóa sản phẩm khỏi giỏ hàng
+          sessionStorage.setItem("cart", JSON.stringify(sessionCart)); // Cập nhật giỏ hàng trong sessionStorage
+          getCart(); // Cập nhật lại giỏ hàng hiển thị trên giao diện
+        }
       }
-    }
-  });
+    });
+  }
 };
-// thanh toán
+// list để đã chọn để thanh
 const chonSanPham = ref([]);
+///////////////////////////////////////////////////////////////
 watch(chonSanPham, (newVal) => {
   console.log("Sản phẩm đã chọn:", JSON.parse(JSON.stringify(newVal)));
 });
 const tongCong = computed(() => {
   return chonSanPham.value.reduce((total, item) => {
-    return total + (item.price || 0) * (item.quantity || 0);
+    const detail = item.idProductDetail || {};
+    const discount = detail.idDiscount?.discountValue || 0;
+    const price = detail.price || 0;
+    const quantity = item.quantity || 0;
+
+    return total + (price - discount) * quantity;
   }, 0);
 });
+// thanh toán
 const thanhToan = async () => {};
 
-onMounted(getCart);
+onMounted(() => {
+  getUserFromSession();
+  getCart();
+});
 </script>
 <style scoped>
 .card:hover {

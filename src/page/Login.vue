@@ -268,23 +268,23 @@ const dangNhap = async () => {
     const token = res.data;
     localStorage.setItem("token", token);
     console.log("Đã lưu token");
+    getUser();
     baoLoi.value = false;
     if (token) {
       try {
         const decodedToken = jwtDecode(token);
         console.log("Payload đã giải mã:", decodedToken);
-
         const userRole = decodedToken.role;
+        sessionStorage.setItem("userRole", userRole);
         console.log("Vai trò người dùng:", userRole);
         if (userRole === true) {
           localStorage.setItem("role", "admin");
           // Làm gì đó cho admin
-          router.replace({ name: "homeAdmin" });
+          location.href = "/discountAdmin";
         } else if (userRole === false) {
           localStorage.setItem("role", "user");
           // Làm gì đó cho người dùng thông thường
-          router.push({ name: "home" });
-          toast.success("chuyển hướng user!");
+          location.href = "/home";
         } else {
           toast.error("Lỗi k rõ role");
         }
@@ -296,11 +296,29 @@ const dangNhap = async () => {
       console.log("Không tìm thấy token.");
       toast.error("Lỗi");
     }
-    toast.success("Đăng nhập thành công!");
   } catch (error) {
     baoLoi.value = true;
     console.log("Status:", error.response.status);
     console.log("Data:", error.response.data);
+  }
+};
+const getUser = async () => {
+  const token = localStorage.getItem("token");
+  if (token) {
+    try {
+      const res = await axios.get("http://localhost:8080/auth/me", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      user.value = res.data;
+      sessionStorage.setItem("user", JSON.stringify(res.data));
+      console.log("đã lkuwu user", JSON.stringify(user.value, null, 2));
+    } catch (error) {
+      console.error(error);
+    }
+  } else {
+    console.log("Không tìm thấy token.");
   }
 };
 </script>

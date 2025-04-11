@@ -382,7 +382,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 import axios from "axios";
 import { useToast } from "vue-toastification";
 import Swal from "sweetalert2";
@@ -419,7 +419,7 @@ const getFullProduct = () => {
   productNoImage.value.forEach((product) => {
     // Tìm các ảnh có idproduct trùng với id của sản phẩm
     const productImages = images.value
-      .filter((image) => image.idProductDetail.id === product.id)
+      .filter((image) => image.productDetailIdl === product.id)
       .map((image) => image.urlImage);
 
     // Ghép thông tin sản phẩm và các ảnh vào productFull
@@ -435,14 +435,52 @@ onMounted(() => {
     .then(() => {
       // Sau khi cả hai đều xong, gọi hàm ghép dữ liệu
       getFullProduct();
+      getUserFromSession();
     })
     .catch((error) => {
       console.error("Lỗi khi tải dữ liệu:", error);
     });
 });
 
-// mua hàng
-const muaHang = async (pd) => {};
+//chek usser
+const getUserFromSession = () => {
+  const storedUser = sessionStorage.getItem("user");
+  user.value = storedUser ? JSON.parse(storedUser) : null;
+};
+const user = ref(null);
+const isLogin = computed(() => !!user.value);
+// thêm vào hàng
+const themVaoGio = async (pd) => {
+  if (isLogin.value) {
+    toast.success("dáyudi");
+  } else {
+    try {
+      const cart = JSON.parse(sessionStorage.getItem("cart")) || [];
+      const existingItem = cart.find(
+        (item) => item.idProductDetail.id === pd.id
+      );
+
+      if (existingItem) {
+        existingItem.quantity += 1;
+      } else {
+        // Nếu chưa có thì thêm mới
+        cart.push({
+          idProductDetail: pd,
+          quantity: 1,
+          dateAdded: new Date().toISOString(),
+        });
+      }
+      // Lưu lại giỏ hàng
+
+      sessionStorage.setItem("cart", JSON.stringify(cart));
+      console.log("Cart hiện tại:", JSON.stringify(cart, null, 2));
+      toast.success("Đã thêm vào giỏ hàng (tạm thời)!");
+    } catch (error) {
+      console.error("Lỗi khi thêm vào giỏ hàng:", error);
+      toast.error("Đã xảy ra lỗi khi thêm vào giỏ hàng!");
+    }
+  }
+};
 
 //fakse user
 const userId = "894de7e6-12c8-4387-94ad-05396cca268d";

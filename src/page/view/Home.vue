@@ -21,7 +21,38 @@
         <!-- Nội dung Navbar -->
         <div class="collapse navbar-collapse" id="navbarNav">
           <!-- Danh sách menu bên trái -->
-          <ul class="navbar-nav me-auto">
+          <ul v-if="userRole === 'true' && isLogin" class="navbar-nav me-auto">
+            <li class="nav-item">
+              <router-link class="nav-link fw-bold fs-6" to="/donHangAdmin">
+                Đơn hàng
+              </router-link>
+            </li>
+            <li class="nav-item">
+              <router-link class="nav-link fw-bold fs-6" to="/hoaDonAdmin">
+                Hóa đơn
+              </router-link>
+            </li>
+            <li class="nav-item">
+              <router-link class="nav-link fw-bold fs-6" to="/discountAdmin">
+                Khuyến mãi
+              </router-link>
+            </li>
+            <li class="nav-item">
+              <router-link class="nav-link fw-bold fs-6" to="/productAdmin">
+                Sản phẩm
+              </router-link>
+            </li>
+
+            <li class="nav-item">
+              <router-link class="nav-link fw-bold fs-6" to="/userAdmin">
+                Khách hàng
+              </router-link>
+            </li>
+          </ul>
+          <ul
+            v-if="userRole === 'false' || !isLogin"
+            class="navbar-nav me-auto"
+          >
             <li class="nav-item">
               <router-link class="nav-link fw-bold fs-6" to="/home">
                 Trang chủ
@@ -78,21 +109,51 @@
                   soLuongGioHang
                 }}</span>
               </router-link>
+            </li>
+
+            <li class="nav-item ms-3">
+              <!-- Nếu chưa đăng nhập -->
               <router-link
-                v-show="isLogin"
+                v-if="!isLogin"
                 class="nav-link fw-bold fs-6"
                 to="/login"
                 style="text-decoration: none; color: black"
               >
-                <div v-show="isLogin">
-                  <h6><a>Đăng nhập</a></h6>
-                </div></router-link
-              >
+                <h6>Đăng nhập</h6>
+              </router-link>
+
+              <!-- Nếu đã đăng nhập -->
+              <div v-if="isLogin" class="dropdown">
+                <button
+                  class="btn btn-outline-dark dropdown-toggle"
+                  type="button"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                >
+                  Xin chào, {{ user.username }}
+                </button>
+
+                <ul class="dropdown-menu">
+                  <router-link
+                    v-if="userRole == 'false'"
+                    to="/donHang"
+                    class="dropdown-item btn btn-link text-start"
+                  >
+                    Quản lý đơn hàng
+                  </router-link>
+                  <li>
+                    <button class="dropdown-item" @click="dangXuat">
+                      Đăng xuất
+                    </button>
+                  </li>
+                </ul>
+              </div>
             </li>
           </ul>
         </div>
       </div>
     </nav>
+
     <router-view></router-view>
 
     <div>
@@ -125,12 +186,47 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import Controllers from "./Controllers.vue";
 import { useRouter } from "vue-router"; // Import useRouter
+import Swal from "sweetalert2";
 
 const router = useRouter(); // Sử dụng useRouter để lấy đối tượng router
-const isLogin = localStorage.getItem("isLogin") ? true : false;
+
+const user = ref(JSON.parse(sessionStorage.getItem("user") || "null"));
+
+const isLogin = computed(() => !!user.value);
+const userRole = ref(sessionStorage.getItem("userRole") || null);
+//dang xuatxuat
+const dangXuat = async () => {
+  console.log("user la", user.value);
+  console.log("userRole la", JSON.stringify(userRole.value, null, 2));
+
+  // Hiển thị hộp thoại xác nhận
+  const result = await Swal.fire({
+    title: "Bạn có chắc muốn đăng xuất?",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonText: "Đăng xuất",
+    cancelButtonText: "Hủy",
+  });
+
+  if (result.isConfirmed) {
+    sessionStorage.removeItem("user");
+    localStorage.removeItem("token");
+    sessionStorage.removeItem("cart");
+    user.value = null;
+
+    await Swal.fire({
+      title: "Đăng xuất thành công!",
+      icon: "success",
+      timer: 1500,
+      showConfirmButton: false,
+    });
+
+    location.href = "/login";
+  }
+};
 
 const noiDung = ref("");
 const timKiem = () => {

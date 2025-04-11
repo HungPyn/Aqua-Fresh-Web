@@ -12,11 +12,15 @@ import ProductDetail from "@/components/ProductDetail.vue";
 import HomeAdmin from "@/page/viewAdmin/HomeAdmin.vue";
 import Login from "@/page/Login.vue";
 import TimKiem from "@/components/TimKiem.vue";
+import DonHang from "@/page/view/DonHang.vue";
+import ThanhToan from "@/components/ThanhToan.vue";
 
 const routes = [
   { path: "/", redirect: "/home" }, // Chuyển hướng mặc định
   { path: "/home", name: "home", component: Controllers },
   { path: "/timKiem", name: "timKiem", component: TimKiem },
+  { path: "/donHang", name: "donHang", component: DonHang },
+  { path: "/thanhToan", name: "thanhToan", component: ThanhToan },
   { path: "/homeAdmin", name: "homeAdmin", component: HomeAdmin },
   { path: "/login", name: "login", component: Login },
   { path: "/discount", name: "discount", component: Discount },
