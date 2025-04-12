@@ -1,5 +1,6 @@
 package com.quafresh.web.aquafreshweb.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -44,6 +45,7 @@ public class ProductDetail {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_discount")
+    @JsonBackReference
     private Discount idDiscount;
 
     @ColumnDefault("b'1'")
