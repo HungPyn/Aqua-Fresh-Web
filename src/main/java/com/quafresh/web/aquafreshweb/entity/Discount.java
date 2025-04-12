@@ -1,5 +1,6 @@
 package com.quafresh.web.aquafreshweb.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -37,6 +38,7 @@ public class Discount {
 
     @OneToMany(mappedBy = "idDiscount",cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
+    @JsonIgnore
     List<ProductDetail> productDetailList;
 
     public void add(ProductDetail productDetail) {

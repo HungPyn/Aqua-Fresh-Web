@@ -45,7 +45,7 @@ public class ProductDetail {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_discount")
-    @JsonBackReference
+
     private Discount idDiscount;
 
     @ColumnDefault("b'1'")
