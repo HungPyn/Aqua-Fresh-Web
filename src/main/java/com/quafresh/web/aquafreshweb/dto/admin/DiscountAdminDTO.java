@@ -5,6 +5,7 @@ import lombok.Data;
 
 import java.math.BigDecimal;
 import java.sql.Date;
+import java.util.List;
 
 @Builder
 @Data
@@ -15,5 +16,6 @@ public class DiscountAdminDTO {
     private Date startDate;
     private Date endDate;
     private String description;
+    private List<ProductDetailAdminDTO> productDetails;
     private Boolean isActive;
 }
