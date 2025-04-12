@@ -22,7 +22,8 @@ public class JwtUtil {
 
     // Tạo token chứa username và role
     public String generateToken(User user) {
-        String mappedRole = ( user.getRole() != null ? "ROLE_ADMIN" : "ROLE_USER");
+//        String mappedRole = ( user.getRole() != null ? "ROLE_ADMIN" : "ROLE_USER");
+        String mappedRole = ( user.getRole() == true ? "ROLE_ADMIN" : "ROLE_USER");
         return Jwts.builder()
                 .setSubject(user.getUsername())
                 .claim("authorities", List.of(mappedRole))  // Đúng định dạng Spring Security
