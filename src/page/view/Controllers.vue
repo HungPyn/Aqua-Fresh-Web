@@ -383,10 +383,12 @@
 
 <script setup>
 import { ref, onMounted, computed } from "vue";
-import axios from "axios";
+import axios, { AxiosHeaders } from "axios";
 import { useToast } from "vue-toastification";
 import Swal from "sweetalert2";
 const toast = useToast();
+
+//get user
 
 const truncateText = (text, maxLength) => {
   if (!text) return "";
@@ -402,11 +404,14 @@ const getImage = async () => {
     console.error("Lỗi lấy ảnh:", error);
   }
 };
+//
+
 //getproduct
 const getProduct = async () => {
   try {
     const response = await axios.get("http://localhost:8080/product");
     productNoImage.value = response.data;
+    console.log("Dữ liệu JSON product no image:");
   } catch (error) {
     console.error("Lỗi lấy product", error);
   }
@@ -452,7 +457,40 @@ const isLogin = computed(() => !!user.value);
 // thêm vào hàng
 const themVaoGio = async (pd) => {
   if (isLogin.value) {
-    toast.success("dáyudi");
+    const cart = {
+      idProductDetail: pd.id,
+      quantity: 1,
+      idUSer: user.value.id,
+    };
+    const token = localStorage.getItem("token");
+    console.log("cart la", JSON.stringify(cart, null, 2));
+    console.log("Token:", token);
+    try {
+      const response = await axios.post(
+        "http://localhost:8080/user/cart",
+        cart,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      toast.success("Đã thêm vào giỏ hàng");
+    } catch (error) {
+      console.error("Lỗi khi thêm vào giỏ hàng:", error);
+
+      if (error.response) {
+        console.error("Status:", error.response.status);
+        console.error("Data:", error.response.data);
+        toast.error(`Lỗi: ${error.response.data.message || "Có lỗi xảy ra!"}`);
+      } else if (error.request) {
+        console.error("Không có phản hồi từ server:", error.request);
+        toast.error("Không có phản hồi từ server.");
+      } else {
+        console.error("Lỗi khác:", error.message);
+        toast.error(`Lỗi: ${error.message}`);
+      }
+    }
   } else {
     try {
       const cart = JSON.parse(sessionStorage.getItem("cart")) || [];

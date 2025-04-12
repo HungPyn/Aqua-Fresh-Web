@@ -274,14 +274,14 @@ const dangNhap = async () => {
       try {
         const decodedToken = jwtDecode(token);
         console.log("Payload đã giải mã:", decodedToken);
-        const userRole = decodedToken.role;
+        const userRole = decodedToken.authorities[0];
         sessionStorage.setItem("userRole", userRole);
         console.log("Vai trò người dùng:", userRole);
-        if (userRole === true) {
+        if (userRole === "ROLE_ADMIN") {
           localStorage.setItem("role", "admin");
           // Làm gì đó cho admin
           location.href = "/discountAdmin";
-        } else if (userRole === false) {
+        } else if (userRole === "ROLE_USER") {
           localStorage.setItem("role", "user");
           // Làm gì đó cho người dùng thông thường
           location.href = "/home";
@@ -313,7 +313,7 @@ const getUser = async () => {
       });
       user.value = res.data;
       sessionStorage.setItem("user", JSON.stringify(res.data));
-      console.log("đã lkuwu user", JSON.stringify(user.value, null, 2));
+      console.log("đã lưu user", JSON.stringify(user.value, null, 2));
     } catch (error) {
       console.error(error);
     }

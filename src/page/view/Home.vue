@@ -21,7 +21,10 @@
         <!-- Nội dung Navbar -->
         <div class="collapse navbar-collapse" id="navbarNav">
           <!-- Danh sách menu bên trái -->
-          <ul v-if="userRole === 'true' && isLogin" class="navbar-nav me-auto">
+          <ul
+            v-if="userRole === 'ROLE_ADMIN' && isLogin"
+            class="navbar-nav me-auto"
+          >
             <li class="nav-item">
               <router-link class="nav-link fw-bold fs-6" to="/donHangAdmin">
                 Đơn hàng
@@ -50,7 +53,7 @@
             </li>
           </ul>
           <ul
-            v-if="userRole === 'false' || !isLogin"
+            v-if="userRole === 'ROLE_USER' || !isLogin"
             class="navbar-nav me-auto"
           >
             <li class="nav-item">
