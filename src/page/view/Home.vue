@@ -138,7 +138,7 @@
 
                 <ul class="dropdown-menu">
                   <router-link
-                    v-if="userRole == 'false'"
+                    v-if="userRole == 'ROLE_USER'"
                     to="/donHang"
                     class="dropdown-item btn btn-link text-start"
                   >

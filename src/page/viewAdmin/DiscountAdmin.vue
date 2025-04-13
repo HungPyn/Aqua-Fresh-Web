@@ -9,7 +9,6 @@
       <!-- Bộ lọc -->
       <div class="col-lg-2 col-md-4 mb-4">
         <div class="border p-3 bg-white shadow-sm rounded">
-          <h5 class="mb-3 text-start">Bộ lọc</h5>
           <input
             class="form-control mb-3"
             placeholder="Tìm kiếm.."
@@ -17,17 +16,6 @@
             @keyup.enter="timKiem"
             @input="timKiem"
           />
-          <label class="form-label">Trạng thái</label>
-          <select
-            class="form-control mb-3"
-            v-model="trangThai"
-            @change="timKiem"
-          >
-            <option value="ALL">Tất cả</option>
-            <option value="EXPIRED">Hết hạn</option>
-            <option value="INACTIVE">Đang chờ</option>
-            <option value="ACTIVE">Đang hoạt động</option>
-          </select>
         </div>
       </div>
 
@@ -37,11 +25,11 @@
           <thead class="table-success">
             <tr>
               <th>STT</th>
-              <th>Mã code</th>
-              <th>Số lượng</th>
-              <th>Phần trăm</th>
+              <th>Tên</th>
+              <th>Giá trị</th>
               <th>Ngày bắt đầu</th>
               <th>Ngày hết hạn</th>
+              <th>Mô tả</th>
               <th>Trạng thái</th>
               <th>Hành động</th>
             </tr>
@@ -53,15 +41,15 @@
               @click="detailAdd(dc)"
             >
               <td>{{ index + 1 }}</td>
-              <td>{{ dc.code }}</td>
-              <td>{{ dc.quantity }}</td>
-              <td>{{ dc.percentage }}%</td>
-              <td>{{ dc.validFrom }}</td>
-              <td>{{ dc.validTo }}</td>
+              <td>{{ dc.name }}</td>
+              <td>{{ dc.discountValue }}</td>
+              <td>{{ dc.startDate }}</td>
+              <td>{{ dc.endDate }}</td>
+              <td>{{ dc.description }}</td>
               <td
                 class="text-warning"
                 v-if="
-                  new Date(dc.validFrom).toISOString().split('T')[0] >
+                  new Date(dc.startDate).toISOString().split('T')[0] >
                   new Date().toISOString().split('T')[0]
                 "
               >
@@ -70,7 +58,7 @@
               <td
                 class="text-success"
                 v-else-if="
-                  new Date(dc.validTo).toISOString().split('T')[0] >=
+                  new Date(dc.endDate).toISOString().split('T')[0] >=
                   new Date().toISOString().split('T')[0]
                 "
               >
@@ -111,32 +99,30 @@
           <form>
             <div class="row">
               <div class="col-md-12 mb-3">
-                <label class="form-label">Mã code</label>
+                <label class="form-label">Tên</label>
                 <input
                   type="text"
                   class="form-control"
-                  v-model="newDiscount.code"
+                  v-model="newDiscount.name"
                   required
                 />
               </div>
-              <div class="col-md-6 mb-3">
-                <label class="form-label">Số lượng</label>
+              <div class="col-md-12 mb-3">
+                <label class="form-label">Mô tả</label>
                 <input
-                  type="number"
+                  type="text"
                   class="form-control"
-                  v-model="newDiscount.quantity"
-                  min="5"
-                  max="100"
-                  step="5"
+                  v-model="newDiscount.description"
                   required
                 />
               </div>
+
               <div class="col-md-6 mb-3">
-                <label class="form-label">Phần trăm (%)</label>
+                <label class="form-label">Giá trị</label>
                 <input
                   type="number"
                   class="form-control"
-                  v-model="newDiscount.percentage"
+                  v-model="newDiscount.discountValue"
                   min="5"
                   max="100"
                   step="5"
@@ -148,7 +134,7 @@
                 <input
                   type="date"
                   class="form-control"
-                  v-model="newDiscount.validFrom"
+                  v-model="newDiscount.startDate"
                   required
                 />
               </div>
@@ -157,7 +143,7 @@
                 <input
                   type="date"
                   class="form-control"
-                  v-model="newDiscount.validTo"
+                  v-model="newDiscount.endDate"
                   required
                 />
               </div>
@@ -199,7 +185,7 @@
   </div>
 </template>
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 import axios from "axios";
 import { useToast } from "vue-toastification";
 import Swal from "sweetalert2";
@@ -225,171 +211,85 @@ const isShow = ref(true);
 const discounts = ref([]);
 const newDiscount = ref({
   id: null,
-  quantity: 1,
-  code: "",
-  percentage: 5,
-  validFrom: null,
-  validTo: null,
-  createAt: new Date().toISOString().split("T")[0],
+  name: "",
+  discountValue: 5,
+  startDate: null,
+  endDate: null,
+  description: "",
+  isActive: true,
 });
-const discountUpdate = ref({
-  id: null,
-  quantity: 1,
-  code: "",
-  percentage: 5,
-  validFrom: null,
-  validTo: null,
-  createAt: null,
-});
-const resetDicountUpdate = () => {
-  discountUpdate.value = {
-    id: null,
-    quantity: 1,
-    code: "",
-    percentage: 5,
-    validFrom: null,
-    validTo: null,
-    createAt: null,
-  };
-};
+
 const resetDiscount = () => {
   newDiscount.value = {
     id: null,
-    quantity: 1,
-    code: "",
-    percentage: 5,
-    validFrom: null,
-    validTo: null,
-    createAt: new Date().toISOString().split("T")[0],
+    name: "",
+    discountValue: 5,
+    startDate: null,
+    endDate: null,
+    description: "",
+    isActive: true,
   };
 };
+//chek usser
+const getUserFromSession = () => {
+  const storedUser = sessionStorage.getItem("user");
+  user.value = storedUser ? JSON.parse(storedUser) : null;
+};
+const user = ref(null);
+const isLogin = computed(() => !!user.value);
 
 // Hàm lấy danh sách mã giảm giá
 const getDiscounts = async () => {
   try {
-    const response = await axios.get(
-      "http://localhost:8080/discounts/hien-thi"
-    );
-    console.log(response.data);
+    const response = await axios.get("http://localhost:8080/admin/discount", {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+      withCredentials: true,
+    });
     discounts.value = response.data;
   } catch (error) {
-    console.error("Lỗi khi gọi API lấy discount:", error);
+    console.error("Lỗi khi laays disscount:", error);
   }
 };
 const detailUpdate = (discount) => {
   newDiscount.value = { ...discount };
-  discountUpdate.value.createAt = discount.createAt;
   isShow.value = false;
 };
-// check mã
-const iscode = ref(false);
-const checkCode = async () => {
-  const code = newDiscount.value.code?.trim();
-  const id = newDiscount.value.id || null;
-  console.log("Giá trị trước khi gửi:", { code, id });
-  if (!code) return;
 
-  console.log("Gửi kiểm tra mã với:", { code, id }); // Debug
-
-  try {
-    const response = await axios.get(
-      "http://localhost:8080/discounts/checkCode",
-      {
-        params: { code, id },
-      }
-    );
-
-    // Kiểm tra giá trị API trả về
-    iscode.value = response.data === true;
-    console.log("Mã có tồn tại không:", iscode.value);
-  } catch (error) {
-    console.error("Lỗi khi gọi API kiểm tra mã giảm giá:", error);
-    iscode.value = false; // Mặc định không có lỗi
-  }
-};
-const checkCodeAdd = async () => {
-  const code = newDiscount.value.code?.trim();
-  const id = -1;
-  console.log("Giá trị trước khi gửi:", { code, id });
-  if (!code) return;
-
-  console.log("Gửi kiểm tra mã với:", { code, id }); // Debug
-
-  try {
-    const response = await axios.get(
-      "http://localhost:8080/discounts/checkCode",
-      {
-        params: { code, id },
-      }
-    );
-
-    // Kiểm tra giá trị API trả về
-    iscode.value = response.data === true;
-    console.log("Mã có tồn tại không:", iscode.value);
-  } catch (error) {
-    console.error("Lỗi khi gọi API kiểm tra mã giảm giá:", error);
-    iscode.value = false; // Mặc định không có lỗi
-  }
-};
+const isActive = ref(true); // Trạng thái hoạt động
 //thêm
 const addDiscount = async () => {
-  console.log(
-    "Dữ liệu trước khi gửi:",
-    JSON.stringify(newDiscount.value, null, 2)
-  );
-
   if (!newDiscount.value) {
     toast.error("Dữ liệu giảm giá không hợp lệ!");
     return;
   }
-  await checkCodeAdd(); // Gọi API kiểm tra mã trước
-  if (iscode.value) {
-    // Nếu mã đã tồn tại, dừng lại
-    toast.error("Mã giảm giá đã tồn tại, vui lòng nhập mã khác!");
-    return;
-  }
-
   const { id, ...discountData } = newDiscount.value;
-
+  discountData.isActive = isActive.value;
   if (
-    !discountData.code.trim() ||
-    discountData.percentage == null ||
-    discountData.quantity == null ||
-    !discountData.validFrom ||
-    !discountData.validTo ||
-    !discountData.createAt
+    !discountData.name.trim() ||
+    !discountData.description.trim() ||
+    !discountData.discountValue == null ||
+    !discountData.startDate ||
+    !discountData.endDate
   ) {
     toast.error("Vui lòng nhập đầy đủ thông tin giảm giá!");
     return;
   }
 
-  if (!Number.isInteger(discountData.quantity) || discountData.quantity < 1) {
-    toast.error("Số lượng phải là số nguyên và lớn hơn hoặc bằng 1!");
-    return;
-  }
-
   if (
-    typeof discountData.percentage !== "number" ||
-    discountData.percentage < 5
+    typeof discountData.discountValue !== "number" ||
+    discountData.discountValue < 5
   ) {
-    toast.error("Phần trăm giảm giá phải là số và lớn hơn hoặc bằng 5!");
+    toast.error("Giá trị phải là số và lớn hơn hoặc bằng 5!");
     return;
   }
+  const startDate = new Date(discountData.startDate);
+  const endDate = new Date(discountData.endDate);
 
-  const createDate = new Date(discountData.createAt);
-  const validFromDate = new Date(discountData.validFrom);
-  const validToDate = new Date(discountData.validTo);
-
-  if (validFromDate < createDate) {
+  if (endDate <= startDate) {
     toast.error(
-      `Ngày áp dụng (${discountData.validFrom}) phải sau hoặc bằng ngày tạo (${discountData.createAt})!`
-    );
-    return;
-  }
-
-  if (validToDate <= validFromDate) {
-    toast.error(
-      `Ngày hết hạn (${discountData.validTo}) phải sau ngày áp dụng (${discountData.validFrom})!`
+      `Ngày hết hạn (${discountData.endDate}) phải sau ngày áp dụng (${discountData.startDate})!`
     );
     return;
   }
@@ -407,8 +307,14 @@ const addDiscount = async () => {
 
   try {
     const response = await axios.post(
-      "http://localhost:8080/discounts/add",
-      discountData
+      "http://localhost:8080/admin/discount/create",
+      discountData,
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        withCredentials: true,
+      }
     );
 
     toast.success("Thêm giảm giá thành công!");
@@ -423,73 +329,36 @@ const addDiscount = async () => {
 };
 
 const updateDiscount = async () => {
-  discountUpdate.value = {
-    ...JSON.parse(JSON.stringify(newDiscount.value)),
-    createAt: discountUpdate.value.createAt,
-  };
-  console.log(
-    "Dữ liệu trước khi gửi update:",
-    JSON.stringify(discountUpdate.value, null, 2)
-  );
-
-  if (!discountUpdate.value) {
+  if (!newDiscount.value) {
     toast.error("Dữ liệu giảm giá không hợp lệ!");
     return;
   }
-  await checkCode(); // Gọi API kiểm tra mã trước
-
-  if (iscode.value) {
-    // Nếu mã đã tồn tại, dừng lại
-    toast.error("Mã giảm giá đã tồn tại, vui lòng nhập mã khác!");
-    return;
-  }
-
-  const { id, ...discountData } = discountUpdate.value;
-
-  // Kiểm tra các trường không được null, rỗng hoặc không hợp lệ
+  const { ...discountData } = newDiscount.value;
+  discountData.isActive = isActive.value;
   if (
-    !discountData.code.trim() ||
-    discountData.percentage == null ||
-    discountData.quantity == null ||
-    !discountData.validFrom ||
-    !discountData.validTo ||
-    !discountData.createAt
+    !discountData.name.trim() ||
+    !discountData.description.trim() ||
+    !discountData.discountValue == null ||
+    !discountData.startDate ||
+    !discountData.endDate
   ) {
     toast.error("Vui lòng nhập đầy đủ thông tin giảm giá!");
     return;
   }
 
-  // Kiểm tra quantity phải là số nguyên >= 1
-  if (!Number.isInteger(discountData.quantity) || discountData.quantity < 1) {
-    toast.error("Số lượng phải là số nguyên và lớn hơn hoặc bằng 1!");
-    return;
-  }
-
-  // Kiểm tra percentage phải là số và >= 5
   if (
-    typeof discountData.percentage !== "number" ||
-    discountData.percentage < 5
+    typeof discountData.discountValue !== "number" ||
+    discountData.discountValue < 5
   ) {
-    toast.error("Phần trăm giảm giá phải là số và lớn hơn hoặc bằng 5!");
+    toast.error("Giá trị phải là số và lớn hơn hoặc bằng 5!");
     return;
   }
+  const startDate = new Date(discountData.startDate);
+  const endDate = new Date(discountData.endDate);
 
-  const createDate = new Date(discountData.createAt);
-  const validFromDate = new Date(discountData.validFrom);
-  const validToDate = new Date(discountData.validTo);
-
-  // Kiểm tra ngày áp dụng phải sau hoặc bằng ngày tạo
-  if (validFromDate < createDate) {
+  if (endDate <= startDate) {
     toast.error(
-      `Ngày áp dụng (${discountData.validFrom}) phải sau hoặc bằng ngày tạo (${discountData.createAt})!`
-    );
-    return;
-  }
-
-  // Kiểm tra ngày hết hạn phải sau ngày áp dụng
-  if (validToDate <= validFromDate) {
-    toast.error(
-      `Ngày hết hạn (${discountData.validTo}) phải sau ngày áp dụng (${discountData.validFrom})!`
+      `Ngày hết hạn (${discountData.endDate}) phải sau ngày áp dụng (${discountData.startDate})!`
     );
     return;
   }
@@ -503,16 +372,23 @@ const updateDiscount = async () => {
   }).then(async (result) => {
     // Cần async ở đây vì có await bên trong
     if (result.isConfirmed) {
+      console.log("Update là: sauwr:", JSON.stringify(discountData, null, 2));
+      const token = localStorage.getItem("token");
+      console.log("JWT Token:", token);
       try {
         const response = await axios.put(
-          "http://localhost:8080/discounts/update",
-          discountUpdate.value
+          `http://localhost:8080/admin/discount/update?id=${discountData.id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+            withCredentials: true,
+          }
         );
 
         toast.success("Sửa mã giảm giá thành công!");
         console.log("Sửa mã giảm giá thành công:", response.data);
 
-        resetDicountUpdate();
         resetDiscount();
         timKiem();
         isShow.value = true;
@@ -540,11 +416,23 @@ const deleteDiscount = async (id) => {
     // Cần async ở đây vì có await bên trong
     if (result.isConfirmed) {
       try {
-        await axios.delete(`http://localhost:8080/discounts/delete/${id}`);
+        await axios.delete(
+          `http://localhost:8080/admin/discount/delete/${id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+            withCredentials: true,
+          }
+        );
         toast.success("Xóa thành công!");
         timKiem(); // Load lại danh sách sau khi xóa
       } catch (error) {
         console.error("Lỗi khi xóa giảm giá:", error);
+        console.error(
+          "Lỗi khi xóa giảm giá:",
+          error.response ? error.response.data : error
+        );
         toast.error("Xóa thất bại!");
       }
     }
@@ -556,11 +444,14 @@ const duLieu = ref("");
 const trangThai = ref("ALL");
 const timKiem = async () => {
   try {
-    const res = await axios("http://localhost:8080/discounts/search", {
+    const res = await axios("http://localhost:8080/admin/discount/search", {
       params: {
-        duLieu: duLieu.value,
-        trangThai: trangThai.value,
+        keyword: duLieu.value,
       },
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+      withCredentials: true,
     });
     console.log(res.data);
     discounts.value = res.data;
@@ -570,7 +461,9 @@ const timKiem = async () => {
 };
 
 // Gọi API khi component được render
-onMounted(getDiscounts);
+onMounted(() => {
+  getDiscounts(), getUserFromSession();
+});
 </script>
 
 <style scoped>

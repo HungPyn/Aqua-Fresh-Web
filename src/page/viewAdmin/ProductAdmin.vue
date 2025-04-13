@@ -16,15 +16,6 @@
           />
         </div>
         <div class="mb-3">
-          <input
-            class="form-control"
-            placeholder="Số lượng.."
-            v-model="soLuong"
-            @keyup.enter="timKiem"
-            @input="timKiem"
-          />
-        </div>
-        <div class="mb-3">
           <label for="vaiTro" class="form-label text-start">Danh mục</label>
           <select class="form-control" @change="timKiem" v-model="danhMuc">
             <option value="">Tất cả</option>
@@ -46,59 +37,129 @@
 
       <div class="col-lg-7">
         <div
+          style="background-color: aliceblue"
           v-for="product in products"
           :key="product.id"
-          class="card mb-3 shadow-sm"
+          class="p-2 mb-2 shadow-sm rounded"
         >
-          <div class="row g-0 align-items-center">
-            <div class="col-md-4 text-center p-2">
+          <div class="row align-items-center">
+            <!-- Hình ảnh bên trái -->
+            <div class="col-md-3 text-center">
               <img
-                :src="product.image"
-                class="img-fluid rounded"
-                alt="Hình ảnh sản phẩm"
-                style="max-height: 150px; object-fit: cover"
+                :src="product.listUrl?.[0]?.urlImage || 'default-img.jpg'"
+                class="img-fluid"
+                style="max-height: 170px"
+                alt="Product Image"
               />
             </div>
-            <div class="col-md-8">
-              <div class="card-body">
-                <h5 class="card-title fw-bold">{{ product.name }}</h5>
-                <p class="card-text text-muted">{{ product.description }}</p>
-                <div class="d-flex justify-content-between align-items-center">
-                  <small class="text-body-secondary"
-                    >Ngày thêm: <b>{{ product.createAt }}</b></small
-                  >
-                  <small class="text-body-secondary"
-                    >Số lượng: <b>{{ product.quantity }}</b></small
-                  >
-                  <small class="text-danger fw-bold"
-                    >Giá:
-                    {{ Number(product.price).toLocaleString("vi-VN") }}
-                    vnđ</small
-                  >
+
+            <!-- Thông tin sản phẩm bên phải -->
+            <div class="col-md-9">
+              <h6 class="fw-bold mb-2">
+                <p>{{ product.idProduct?.productName || "Không có tên" }}</p>
+              </h6>
+
+              <!-- Mô tả -->
+              <p class="mb-1">
+                <b>Mô tả:</b>
+                {{ truncateText(product.description || "Không có mô tả", 155) }}
+              </p>
+
+              <!-- Hãng & Danh mục (Căn đều và sát lại) -->
+              <div class="row mb-1">
+                <div class="col-6 col-md-3">
+                  <p>
+                    Hãng:
+                    <b>{{
+                      product.idProduct?.idCompany?.name || "Không rõ"
+                    }}</b>
+                  </p>
                 </div>
-                <div class="mt-2 d-flex justify-content-end">
-                  <button
-                    class="btn btn-warning btn-sm"
-                    @click="deleteProduct(product.id)"
-                  >
-                    Xóa
-                  </button>
-                  <button
-                    class="btn btn-success btn-sm ms-2"
-                    @click="detailUpdate(product)"
-                  >
-                    Sửa
-                  </button>
+                <div class="col-6 col-md-3">
+                  <p>
+                    Kiểu dáng:
+                    <b>{{
+                      product.idProduct?.idCategory?.name || "Không rõ"
+                    }}</b>
+                  </p>
                 </div>
+              </div>
+
+              <!-- Màu & Công nghệ (Căn đều và sát lại) -->
+              <div class="row mb-1">
+                <div class="col-6 col-md-3">
+                  <p>
+                    Màu
+                    <b>{{ product.idColor?.name || "Không rõ" }}</b>
+                  </p>
+                </div>
+                <div class="col-6 col-md-3">
+                  <p>
+                    Công nghệ:
+                    <b>{{ product.idTechnology?.name || "Không rõ" }}</b>
+                  </p>
+                </div>
+              </div>
+
+              <!-- Số lượng & Giá -->
+              <div class="row mb-1">
+                <div class="col-6">
+                  <p class="mb-1">
+                    Số lượng:
+                    <b>{{ product.quantity }}</b>
+                  </p>
+                </div>
+                <div class="col-6">
+                  <b>Giá:</b>
+                  <b
+                    v-if="product.idDiscount?.discountValue > 0"
+                    class="text-danger"
+                  >
+                    {{
+                      (
+                        product.price - product.idDiscount.discountValue
+                      ).toLocaleString("vi-VN")
+                    }}đ
+                  </b>
+                  <span v-else class="text-danger">
+                    {{ product.price?.toLocaleString("vi-VN") || "0" }}đ
+                  </span>
+                </div>
+
+                <button
+                  class="btn btn-sm btn-warning me-1"
+                  @click="updateProduct(product)"
+                >
+                  Sửa
+                </button>
+                <button
+                  class="btn btn-sm btn-danger"
+                  @click="deleteProduct(product.id)"
+                >
+                  Xóa
+                </button>
+              </div>
+
+              <!-- Thông tin khuyến mãi -->
+              <div v-if="product.idDiscount?.discountValue > 0" class="mt-1">
+                <small class="text-success">
+                  {{ product.idDiscount.discountName }}: -
+                  {{
+                    product.idDiscount.discountValue.toLocaleString("vi-VN")
+                  }}đ ({{ product.idDiscount.description }})
+                </small>
               </div>
             </div>
           </div>
         </div>
+
+        <!-- Không có kết quả -->
         <div class="text-center text-danger" v-if="products.length === 0">
           <b><h5>Không tìm thấy kết quả</h5></b>
           <br /><br /><br />
         </div>
 
+        <!-- Phân trang -->
         <nav aria-label="Pagination">
           <ul class="pagination justify-content-center">
             <li class="page-item disabled"><a class="page-link">Trước</a></li>
@@ -191,11 +252,15 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 import axios from "axios";
 import { useToast } from "vue-toastification";
 import Swal from "sweetalert2";
 
+const truncateText = (text, maxLength) => {
+  if (!text) return "";
+  return text.length > maxLength ? text.substring(0, maxLength) + "..." : text;
+};
 //tim kiếm
 const duLieu = ref("");
 const danhMuc = ref("");
@@ -222,15 +287,17 @@ const setGia = () => {
 
 const timKiem = async () => {
   try {
-    const res = await axios("http://localhost:8080/products/search", {
-      params: {
-        duLieu: duLieu.value,
-        danhMuc: danhMuc.value,
-        gia1: gia1.value,
-        gia2: gia2.value,
-        soLuong: soLuong.value,
-      },
-    });
+    const res = await axios(
+      "http://localhost:8080/admin/products-detail/search",
+      {
+        params: {
+          name: duLieu.value,
+        },
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
+    );
     console.log(res.data);
     products.value = res.data;
   } catch (error) {
@@ -323,19 +390,32 @@ const getCategory = async () => {
     console.error("Lỗi khi gọi category:", error);
   }
 };
+//chek usser
+const getUserFromSession = () => {
+  const storedUser = sessionStorage.getItem("user");
+  user.value = storedUser ? JSON.parse(storedUser) : null;
+};
+const user = ref(null);
+const isLogin = computed(() => !!user.value);
 // lấy productproduct
 const getProduct = async () => {
   try {
-    const res = await axios.get("http://localhost:8080/products/hien-thi");
+    const res = await axios.get("http://localhost:8080/product", {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+      withCredentials: true,
+    });
     console.log(res.data);
     products.value = res.data;
+    console.log("Dữ liệu products:", JSON.stringify(products.value, null, 2));
   } catch (error) {
     console.error("Lỗi khi gọi product:", error);
   }
 };
 onMounted(() => {
-  getCategory();
   getProduct();
+  getUserFromSession();
 });
 
 // tạo iswhow để hiện update

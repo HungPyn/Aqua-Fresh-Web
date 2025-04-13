@@ -153,7 +153,7 @@
           <div class="col-md-1 text-center">
             <button
               class="btn btn-sm btn-danger rounded-0"
-              @click="xoaGioHang(item)"
+              @click.stop="xoaGioHang(item)"
             >
               Xóa
             </button>
@@ -179,7 +179,7 @@
           >
         </h4>
         <button
-          @click="thanhToan"
+          v-if="chonSanPham.length > 0"
           data-bs-toggle="modal"
           data-bs-target="#modalThanhToan"
           class="btn btn-success mt-2 rounded-0"
@@ -189,12 +189,12 @@
       </div>
     </div>
 
-    <!-- Modal Thanh Toán -->
+    <!-- Modal Thanh Toán/////////////////////////////////////////////////////////////////////////////////////////////////////// -->
     <div class="modal fade" id="modalThanhToan" tabindex="-1">
-      <div class="modal-dialog modal-lg">
-        <div class="modal-content">
+      <div class="modal-dialog modal-xl">
+        <div class="modal-content rounded-0">
           <div class="modal-header">
-            <h5 class="modal-title">Xác nhận thanh toán</h5>
+            <h5 class="modal-title">Xác nhận thông tin</h5>
             <button
               type="button"
               class="btn-close"
@@ -203,18 +203,173 @@
           </div>
 
           <div class="modal-body">
-            <p>Bạn có chắc muốn thanh toán các sản phẩm đã chọn?</p>
+            <div class="row">
+              <div class="col-7">
+                <div
+                  style="background-color: aliceblue"
+                  v-for="item in chonSanPham"
+                  :key="item.id"
+                  class="p-2 mb-2 shadow-sm"
+                >
+                  <div class="row align-items-center">
+                    <!-- Hình ảnh và tên sản phẩm -->
+                    <div class="col-md-3 text-center">
+                      <img
+                        :src="item.idProductDetail.listUrl[0].urlImage"
+                        class="img-fluid rounded"
+                        style="max-height: 100px; width: auto"
+                        alt="Product Image"
+                      />
+                    </div>
+                    <div class="col-md-9">
+                      <h6
+                        class="card-title mb-0 fs-6"
+                        style="font-size: 0.9rem"
+                      >
+                        {{ item.idProductDetail.idProduct.productName }}
+                      </h6>
+
+                      <!-- Số lượng và tổng tiền ngang hàng -->
+                      <div
+                        class="col-md-12 text-center mt-2 d-flex justify-content-between"
+                        style="padding-left: 0px; padding-right: 0px"
+                      >
+                        <!-- Số lượng -->
+                        <div
+                          class="px-2"
+                          style="
+                            flex-grow: 1;
+                            text-align: left;
+                            margin-right: 10px;
+                          "
+                        >
+                          <p class="mb-0" style="font-size: 0.8rem">
+                            Số lượng: <b>{{ item.quantity }}</b>
+                          </p>
+                        </div>
+
+                        <!-- Tổng tiền -->
+                        <div
+                          class="px-2"
+                          style="
+                            flex-grow: 1;
+                            text-align: right;
+                            margin-left: 10px;
+                          "
+                        >
+                          <p class="mb-0" style="font-size: 0.8rem">
+                            <b>Giá: </b>
+                            <b
+                              class="text-danger"
+                              v-if="
+                                item.idProductDetail.idDiscount
+                                  .discountValue === 0
+                              "
+                            >
+                              {{
+                                Number(
+                                  item.idProductDetail.price
+                                ).toLocaleString("vi-VN")
+                              }}đ
+                            </b>
+                            <b
+                              class="text-danger"
+                              v-if="
+                                item.idProductDetail.idDiscount.discountValue >
+                                0
+                              "
+                            >
+                              {{
+                                Number(
+                                  item.idProductDetail.price -
+                                    item.idProductDetail.idDiscount
+                                      .discountValue
+                                ).toLocaleString("vi-VN")
+                              }}đ
+                            </b>
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-5">
+                <h5 class="mb-3 text-center">Thông tin</h5>
+                <form>
+                  <div class="row mb-3">
+                    <div class="col-6">
+                      <input
+                        type="text"
+                        class="form-control border"
+                        id="fullname"
+                        placeholder=" Họ và tên"
+                      />
+                    </div>
+                    <div class="col-6">
+                      <input
+                        type="text"
+                        class="form-control border"
+                        id="phone"
+                        placeholder=" Số điện thoại"
+                      />
+                    </div>
+                  </div>
+
+                  <div class="mb-3">
+                    <input
+                      type="email"
+                      class="form-control border"
+                      id="email"
+                      placeholder=" Email"
+                    />
+                  </div>
+
+                  <div class="mb-3">
+                    <label for="address" class="form-label"
+                      >Tỉnh/Thành phố</label
+                    >
+                    <select class="form-select border" id="address">
+                      <option selected disabled>Chọn tỉnh/thành</option>
+                      <option value="01">Hà Nội</option>
+                      <option value="79">TP Hồ Chí Minh</option>
+                      <option value="48">Đà Nẵng</option>
+                    </select>
+                  </div>
+
+                  <div class="mb-3">
+                    <input
+                      type="text"
+                      class="form-control border"
+                      id="specificAddress"
+                      placeholder=" Địa chỉ chi tiết"
+                    />
+                  </div>
+                </form>
+                <br />
+                <hr />
+                <h6>
+                  Tiền ship:
+                  <b class="text-danger">
+                    {{ Number(44444444).toLocaleString("vi-VN") }} đ</b
+                  >
+                </h6>
+
+                <h5>
+                  Tổng:
+                  <b class="text-danger"
+                    >{{ Number(8888888).toLocaleString("vi-VN") }} đ</b
+                  >
+                </h5>
+              </div>
+            </div>
           </div>
 
           <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-secondary"
-              data-bs-dismiss="modal"
-            >
-              Hủy
+            <button type="button" class="btn btn-primary rounded-0">
+              Xác nhận
             </button>
-            <button type="button" class="btn btn-primary">Xác nhận</button>
           </div>
         </div>
       </div>
@@ -227,6 +382,7 @@ import axios from "axios";
 import { computed, onMounted, ref, watch } from "vue";
 import { useToast } from "vue-toastification";
 import Swal from "sweetalert2";
+import js from "@eslint/js";
 
 const toast = useToast();
 
@@ -286,6 +442,9 @@ const updateSoLuong = async (gh) => {
     // } catch (error) {
     //   console.error("Lỗi:", error.response ? error.response.data : error);
     // }
+    toast.success("Cập nhật số lượng thành công", {
+      timeout: 1000,
+    });
   } else {
     const sessionCart = JSON.parse(sessionStorage.getItem("cart")) || [];
     const index = sessionCart.findIndex(
@@ -304,13 +463,30 @@ const userId = "894de7e6-12c8-4387-94ad-05396cca268d";
 const getUserFromSession = () => {
   const storedUser = sessionStorage.getItem("user");
   user.value = storedUser ? JSON.parse(storedUser) : null;
+  console.log("User từ session:", JSON.stringify(user.value, null, 2));
 };
 const user = ref(null);
 const isLogin = computed(() => !!user.value);
+
 //lấy ra giỏ hàng
 
 const getCart = async () => {
   if (isLogin.value) {
+    const idUser = user.value.id;
+    try {
+      const response = await axios.get(
+        `http://localhost:8080/user/cart/${idUser}`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+          withCredentials: true,
+        }
+      );
+      cart.value = response.data;
+    } catch (error) {
+      console.error("Lỗi khi lấy giỏ hàng:", error);
+    }
   } else {
     const sessionCart = JSON.parse(sessionStorage.getItem("cart")) || [];
     cart.value = sessionCart;
@@ -319,23 +495,31 @@ const getCart = async () => {
 //xóa
 const xoaGioHang = async (gh) => {
   if (isLogin.value) {
-    // Swal.fire({
-    //   title: "Bạn có muốn xóa không?",
-    //   icon: "warning",
-    //   showCancelButton: true,
-    //   confirmButtonText: "Có",
-    //   cancelButtonText: "Không",
-    // }).then(async (result) => {
-    //   // Cần async ở đây vì có await bên trong
-    //   if (result.isConfirmed) {
-    //     try {
-    //       await axios.delete(`http://localhost:8080/cart/delete/${id}`);
-    //       getCart();
-    //     } catch (error) {
-    //       console.error("Lỗi:", error.response ? error.response.data : error);
-    //     }
-    //   }
-    // });
+    Swal.fire({
+      title: "Bạn có muốn xóa không?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Có",
+      cancelButtonText: "Không",
+    }).then(async (result) => {
+      // Cần async ở đây vì có await bên trong
+      if (result.isConfirmed) {
+        try {
+          const response = await axios.delete(
+            `http://localhost:8080/user/cart/delete/${gh.id}`,
+            {
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+              },
+              withCredentials: true,
+            }
+          );
+          getCart();
+        } catch (error) {
+          console.error("Lỗi khi lấy giỏ hàng:", error);
+        }
+      }
+    });
   } else {
     Swal.fire({
       title: "Bạn có muốn xóa không?",
@@ -363,7 +547,7 @@ const xoaGioHang = async (gh) => {
 const chonSanPham = ref([]);
 ///////////////////////////////////////////////////////////////
 watch(chonSanPham, (newVal) => {
-  console.log("Sản phẩm đã chọn:", JSON.parse(JSON.stringify(newVal)));
+  console.log("Sản phẩm đã chọn:", JSON.stringify(newVal, null, 2));
 });
 const tongCong = computed(() => {
   return chonSanPham.value.reduce((total, item) => {

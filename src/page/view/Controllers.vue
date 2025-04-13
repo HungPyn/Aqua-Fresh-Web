@@ -462,9 +462,6 @@ const themVaoGio = async (pd) => {
       quantity: 1,
       idUSer: user.value.id,
     };
-    const token = localStorage.getItem("token");
-    console.log("cart la", JSON.stringify(cart, null, 2));
-    console.log("Token:", token);
     try {
       const response = await axios.post(
         "http://localhost:8080/user/cart",
@@ -473,9 +470,12 @@ const themVaoGio = async (pd) => {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
+          withCredentials: true,
         }
       );
-      toast.success("Đã thêm vào giỏ hàng");
+      toast.success("Đã thêm vào giỏ hàng!", {
+        timeout: 1000,
+      });
     } catch (error) {
       console.error("Lỗi khi thêm vào giỏ hàng:", error);
 
@@ -512,7 +512,9 @@ const themVaoGio = async (pd) => {
 
       sessionStorage.setItem("cart", JSON.stringify(cart));
       console.log("Cart hiện tại:", JSON.stringify(cart, null, 2));
-      toast.success("Đã thêm vào giỏ hàng (tạm thời)!");
+      toast.success("Đã thêm vào giỏ hàng (tạm thời)!", {
+        timeout: 1000,
+      });
     } catch (error) {
       console.error("Lỗi khi thêm vào giỏ hàng:", error);
       toast.error("Đã xảy ra lỗi khi thêm vào giỏ hàng!");
