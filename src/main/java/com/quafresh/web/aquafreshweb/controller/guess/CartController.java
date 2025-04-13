@@ -27,7 +27,7 @@ public class CartController {
         return cartGuess.save(cart);
     }
 
-    @PostMapping("/delete/{id}")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> deleteById(@PathVariable Integer id){
         return cartGuess.deleteById(id);
     }
