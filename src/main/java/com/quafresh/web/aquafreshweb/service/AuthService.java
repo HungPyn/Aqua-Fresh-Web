@@ -6,6 +6,7 @@ import com.quafresh.web.aquafreshweb.dto.RegisterDTO;
 import com.quafresh.web.aquafreshweb.entity.User;
 import com.quafresh.web.aquafreshweb.repositories.UserRepository;
 import com.quafresh.web.aquafreshweb._config.JwtUtil;
+import com.quafresh.web.aquafreshweb.repositories.WardRepository;
 import com.quafresh.web.aquafreshweb.util.AdminMapper;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -26,7 +27,7 @@ public class AuthService implements UserDetailsService {
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
     private final AdminMapper adminMapper;
-
+    private final WardRepository wardRepository;
     @Override
     public UserDetails loadUserByUsername(String username) {
         User detail = userRepository.findByUsername(username)
@@ -47,9 +48,9 @@ public class AuthService implements UserDetailsService {
         user.setFullname(registerDTO.getFullname());
         user.setEmail(registerDTO.getEmail());
         user.setPhone(registerDTO.getPhone());
+        user.setAddress(wardRepository.findByWardName(registerDTO.getAddress()));
         user.setRole(false);  // Giả sử mặc định là User (có thể thay đổi nếu muốn)
         userRepository.save(user);
-
         return "User registered successfully";
     }
 

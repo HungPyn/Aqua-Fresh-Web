@@ -6,6 +6,7 @@ import com.quafresh.web.aquafreshweb.dto.guess.ProductDetailGuessDTO;
 import com.quafresh.web.aquafreshweb.dto.guess.ProductDetailGuessDTO2;
 import com.quafresh.web.aquafreshweb.entity.*;
 import com.quafresh.web.aquafreshweb.service.Impl.*;
+import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +15,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
+@AllArgsConstructor
 @RequestMapping("/product")
 public class HomeController {
 
@@ -24,24 +26,7 @@ public class HomeController {
     private final TechnologyServiceImpl technologyServiceImpl;
     private final CompanyServiceImpl companyServiceImpl;
     private final PictureGuessServiceImpl pictureGuessService;
-
-    public HomeController(ProductDetailImpl productDetail,
-                          ColorServiceImpl colorServiceImpl,
-                          DiscountServiceImpl discountServiceImpl,
-                          CategoryServiceImpl categoryServiceImpl,
-                          TechnologyServiceImpl technologyServiceImpl,
-                          CompanyServiceImpl companyServiceImpl,
-                          PictureGuessServiceImpl pictureGuessService
-                          ) {
-        this.productDetail = productDetail;
-        this.colorServiceImpl = colorServiceImpl;
-        this.discountServiceImpl = discountServiceImpl;
-        this.categoryServiceImpl = categoryServiceImpl;
-        this.technologyServiceImpl = technologyServiceImpl;
-        this.companyServiceImpl = companyServiceImpl;
-        this.pictureGuessService = pictureGuessService;
-
-    }
+    private final WardServiceImpl wardService;
 
     @GetMapping
     public ResponseEntity<List<ProductDetail>> getAllProduct() {
@@ -96,4 +81,8 @@ public class HomeController {
         return technologyServiceImpl.getAllTechnology();
     }
 
+    @GetMapping("/address")
+    public ResponseEntity<List<Ward>> getAllAdress(){
+        return wardService.getAllAddress();
+    }
 }
