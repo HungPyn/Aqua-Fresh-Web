@@ -81,4 +81,8 @@ public class HomeController {
         return technologyServiceImpl.getAllTechnology();
     }
 
+    @GetMapping("/address")
+    public ResponseEntity<List<Ward>> getAllAdress(){
+        return wardService.getAllAddress();
+    }
 }
