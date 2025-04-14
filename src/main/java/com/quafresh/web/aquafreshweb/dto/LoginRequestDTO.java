@@ -13,5 +13,6 @@ public class LoginRequestDTO {
     private String username;
     private String email;
     private String phone;
+    private String specificAddress;
     private Ward address;
 }

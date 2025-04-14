@@ -32,6 +32,8 @@ public class ProductDetail {
     @Column(name = "quantity")
     private Integer quantity;
 
+    @Column(name = "code_product_detail")
+    private String codeProductDetail;
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_color")
     private Color idColor;

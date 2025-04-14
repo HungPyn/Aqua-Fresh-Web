@@ -41,7 +41,7 @@ public class User implements UserDetails {
     @Column(name = "role")
     private Boolean role;
     @Column(name = "specific_address")
-    private String specificAdress;
+    private String specificAddress;
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         // Trả về quyền dựa trên giá trị của role
