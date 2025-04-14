@@ -12,5 +12,6 @@ public class   RegisterDTO {
     private String fullname;
     private String email;
     private String phone;
-    private String address;
+    private Ward ward;
+    private String specificAdress;
 }

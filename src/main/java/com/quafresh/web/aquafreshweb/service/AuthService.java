@@ -4,6 +4,7 @@ import com.quafresh.web.aquafreshweb.dto.LoginDTO;
 import com.quafresh.web.aquafreshweb.dto.LoginRequestDTO;
 import com.quafresh.web.aquafreshweb.dto.RegisterDTO;
 import com.quafresh.web.aquafreshweb.entity.User;
+import com.quafresh.web.aquafreshweb.entity.Ward;
 import com.quafresh.web.aquafreshweb.repositories.UserRepository;
 import com.quafresh.web.aquafreshweb._config.JwtUtil;
 import com.quafresh.web.aquafreshweb.repositories.WardRepository;
@@ -40,7 +41,6 @@ public class AuthService implements UserDetailsService {
         if (userRepository.existsByUsername(registerDTO.getUsername())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Username is already in use");
         }
-
         // Tạo người dùng mới và lưu vào database
         User user = new User();
         user.setUsername(registerDTO.getUsername());
@@ -48,7 +48,8 @@ public class AuthService implements UserDetailsService {
         user.setFullname(registerDTO.getFullname());
         user.setEmail(registerDTO.getEmail());
         user.setPhone(registerDTO.getPhone());
-        user.setAddress(wardRepository.findByWardName(registerDTO.getAddress()));
+        user.setAddress(registerDTO.getWard());
+        user.setSpecificAdress(registerDTO.getSpecificAdress());
         user.setRole(false);  // Giả sử mặc định là User (có thể thay đổi nếu muốn)
         userRepository.save(user);
         return "User registered successfully";
