@@ -22,7 +22,7 @@ public class CompanyImpl implements CompanyService {
         return CompanyAdminDTO.builder()
                 .id(company.getId())
                 .name(company.getName())
-                .status(company.getStatus())
+                .status(company.isStatus())
                 .build();
     }
 
@@ -32,7 +32,7 @@ public class CompanyImpl implements CompanyService {
         return companyList.stream().map(company -> CompanyAdminDTO.builder()
                 .id(company.getId())
                 .name(company.getName())
-                .status(company.getStatus())
+                .status(company.isStatus())
                 .build())
                 .collect(Collectors.toList());
     }
@@ -46,7 +46,7 @@ public class CompanyImpl implements CompanyService {
         return companyList.stream().map(company -> CompanyAdminDTO.builder()
                         .id(company.getId())
                         .name(company.getName())
-                        .status(company.getStatus())
+                        .status(company.isStatus())
                         .build())
                 .collect(Collectors.toList());
     }
@@ -55,12 +55,12 @@ public class CompanyImpl implements CompanyService {
     public CompanyAdminDTO create(CompanyAdminDTO companyAdminDTO) {
         Company company = new Company();
         company.setName(companyAdminDTO.getName());
-        company.setStatus(companyAdminDTO.getStatus());
+        company.setStatus(companyAdminDTO.isStatus());
         company = companyRepository.save(company);
         return CompanyAdminDTO.builder()
                 .id(company.getId())
                 .name(company.getName())
-                .status(company.getStatus())
+                .status(company.isStatus())
                 .build();
     }
 
@@ -68,11 +68,11 @@ public class CompanyImpl implements CompanyService {
     public CompanyAdminDTO update(Integer id, CompanyAdminDTO companyAdminDTO) {
         Company company = companyRepository.findById(id).orElseThrow(()->new EntityNotFoundException("Company not found"));
         company.setName(companyAdminDTO.getName());
-        company.setStatus(companyAdminDTO.getStatus());
+        company.setStatus(companyAdminDTO.isStatus());
         return CompanyAdminDTO.builder()
                 .id(company.getId())
                 .name(company.getName())
-                .status(company.getStatus())
+                .status(company.isStatus())
                 .build();
     }
 

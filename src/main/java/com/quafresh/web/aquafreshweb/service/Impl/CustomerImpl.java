@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -37,6 +38,7 @@ public class CustomerImpl implements CustomerService {
         customer.setPhone(customerDTO.getPhone());
         customer.setEmail(customerDTO.getEmail());
         customer.setAddress(customerDTO.getAddress());
+        customer.setRole(false);
         userRepository.save(customer);
         return adminMapper.toCustomerDTO(customer);
     }
@@ -49,6 +51,9 @@ public class CustomerImpl implements CustomerService {
         customer.setFullname(customerDTO.getFullname());
         customer.setPhone(customerDTO.getPhone());
         customer.setEmail(customerDTO.getEmail());
+        LocalDate localDate = LocalDate.now();
+        java.sql.Date sqlDate = java.sql.Date.valueOf(localDate);
+        customer.setDayCreation(sqlDate);
         customer.setAddress(customerDTO.getAddress());
         userRepository.save(customer);
         return adminMapper.toCustomerDTO(customer);
