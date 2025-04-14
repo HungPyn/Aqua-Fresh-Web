@@ -14,6 +14,7 @@ public class ProductDetailAdminDTO {
     private ProductAdminDTO idProduct;
     private BigDecimal price;
     private Integer quantity;
+    private String codeProductDetail;
     private ColorAdminDtO idColor;
     private TechnologyAdminDTO idTechnology;
     private DiscountAdminDTO idDiscount;

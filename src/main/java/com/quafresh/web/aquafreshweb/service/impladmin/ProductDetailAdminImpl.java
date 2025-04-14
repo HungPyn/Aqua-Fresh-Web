@@ -48,6 +48,7 @@ public class ProductDetailAdminImpl implements ProductDetailAdminService {
     public ProductDetailAdminDTO create(ProductDetailAdminDTO dto) {
         ProductDetail productDetail = new ProductDetail();
 
+        productDetail.setCodeProductDetail(dto.getCodeProductDetail());
         productDetail.setPrice(dto.getPrice());
         productDetail.setQuantity(dto.getQuantity());
         productDetail.setDescription(dto.getDescription());
@@ -100,7 +101,8 @@ public class ProductDetailAdminImpl implements ProductDetailAdminService {
     @Transactional
     public ProductDetailAdminDTO update(Integer id, ProductDetailAdminDTO productAdminDTO) {
        ProductDetail productDetail = productDetailRepository.findById(id).orElseThrow(() -> new RuntimeException("Product not found"));
-        productDetail.setPrice(productAdminDTO.getPrice());
+        productDetail.setCodeProductDetail(productAdminDTO.getCodeProductDetail());
+       productDetail.setPrice(productAdminDTO.getPrice());
         productDetail.setQuantity(productAdminDTO.getQuantity());
         productDetail.setDescription(productAdminDTO.getDescription());
         productDetail.setStatus(productAdminDTO.getStatus());

@@ -13,6 +13,6 @@ import java.util.List;
 
 @Repository
 public interface ProductDetailRepository extends JpaRepository<ProductDetail, Integer> {
-    @Query("SELECT pd FROM ProductDetail pd WHERE pd.idProduct.productName LIKE %:name%")
+    @Query("SELECT pd FROM ProductDetail pd WHERE pd.codeProductDetail LIKE %:name%")
     List<ProductDetail> findByProductName(@Param("name") String name);
 }

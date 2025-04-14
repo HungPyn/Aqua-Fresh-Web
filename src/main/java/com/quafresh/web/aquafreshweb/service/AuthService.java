@@ -49,7 +49,7 @@ public class AuthService implements UserDetailsService {
         user.setEmail(registerDTO.getEmail());
         user.setPhone(registerDTO.getPhone());
         user.setAddress(registerDTO.getWard());
-        user.setSpecificAdress(registerDTO.getSpecificAdress());
+        user.setSpecificAddress(registerDTO.getSpecificAdress());
         user.setRole(false);  // Giả sử mặc định là User (có thể thay đổi nếu muốn)
         userRepository.save(user);
         return "User registered successfully";
