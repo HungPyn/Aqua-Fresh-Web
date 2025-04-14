@@ -1,5 +1,6 @@
 package com.quafresh.web.aquafreshweb.dto;
 
+import com.quafresh.web.aquafreshweb.entity.Ward;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -12,5 +13,5 @@ public class LoginRequestDTO {
     private String username;
     private String email;
     private String phone;
-    private String address;
+    private Ward address;
 }

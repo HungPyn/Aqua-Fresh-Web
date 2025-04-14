@@ -35,10 +35,13 @@ public class User implements UserDetails {
     private String phone;
     @Column(name = "day_creation")
     private Date dayCreation;
-    @Column(name = "address")
-    private String address;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "address", referencedColumnName = "ward_id_api")
+    private Ward address;
     @Column(name = "role")
     private Boolean role;
+    @Column(name = "specific_address")
+    private String specificAdress;
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         // Trả về quyền dựa trên giá trị của role

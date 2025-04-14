@@ -11,6 +11,7 @@ import java.util.List;
 
 @RequestMapping("/admin/discount")
 @RequiredArgsConstructor
+@RestController
 @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
 public class DiscountAdminController {
     private final DiscountAdminImpl discountAdminImpl;
@@ -21,7 +22,7 @@ public class DiscountAdminController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<List<DiscountAdminDTO>> search(String keyword) {
+    public ResponseEntity<List<DiscountAdminDTO>> search(@RequestParam String keyword) {
         return ResponseEntity.ok(discountAdminImpl.search(keyword));
     }
 
@@ -31,12 +32,12 @@ public class DiscountAdminController {
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<DiscountAdminDTO> update(@RequestParam Integer id, @RequestBody DiscountAdminDTO discountAdminDTO) {
+    public ResponseEntity<DiscountAdminDTO> update(@PathVariable Integer id, @RequestBody DiscountAdminDTO discountAdminDTO) {
         return ResponseEntity.ok(discountAdminImpl.update(id, discountAdminDTO));
     }
 
-    @DeleteMapping("delete/{id}")
-    public ResponseEntity<String> delete(@RequestParam Integer id) {
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<String> delete(@PathVariable Integer id) {
         return ResponseEntity.ok(discountAdminImpl.delete(id));
     }
 }

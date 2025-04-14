@@ -20,7 +20,7 @@ public class ProductDetailAdminController {
     public ResponseEntity<List<ProductDetailAdminDTO>> getAllProductDetails() {
         return ResponseEntity.ok(productDetailAdmin.getAll());
     }
-    @GetMapping("search")
+    @GetMapping("/search")
     public ResponseEntity<List<ProductDetailAdminDTO>> getProductDetailsByName(@RequestParam String name) {
         return ResponseEntity.ok(productDetailAdmin.search(name));
     }

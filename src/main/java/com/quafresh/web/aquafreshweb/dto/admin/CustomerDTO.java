@@ -1,5 +1,6 @@
 package com.quafresh.web.aquafreshweb.dto.admin;
 
+import com.quafresh.web.aquafreshweb.entity.Ward;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -17,5 +18,5 @@ public class CustomerDTO {
     private String phone;
     private String email;
     private Date dayCreation;
-    private String address;
+    private Ward address;
 }

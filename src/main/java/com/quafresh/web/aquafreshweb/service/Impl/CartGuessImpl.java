@@ -13,10 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class CartGuessImpl implements CartServiceGuess {
@@ -39,20 +36,43 @@ public class CartGuessImpl implements CartServiceGuess {
     }
 
     @Override
-    public ResponseEntity<Cart> save(CartGuessDTO cart) {
+    public ResponseEntity<Cart> save(CartGuessDTO cartGuessDTO) {
         try {
-            ProductDetail productDetail = productDetailRepository.findById(cart.getIdProductDetail()).get();
-            User user = userRepository.findById(cart.getIdUSer()).get();
-            Cart cart1 = new Cart();
-            cart1.setDateAdded(new Date().toInstant());
-            cart1.setIdProductDetail(productDetail);
-            cart1.setIdUser(user);
-            cart1.setQuantity(cart.getQuantity());
-            return new ResponseEntity<>(cartRepository.save(cart1), HttpStatus.OK);
+            ProductDetail productDetail = productDetailRepository.findById(cartGuessDTO.getIdProductDetail())
+                    .orElseThrow(() -> new NoSuchElementException("Product not found"));
+            User user = userRepository.findById(cartGuessDTO.getIdUSer())
+                    .orElseThrow(() -> new NoSuchElementException("User not found"));
+
+            Optional<Cart> existingCartOpt = cartRepository.findByIdUserAndIdProductDetail(user, productDetail);
+            Cart cart;
+
+            boolean status = cartGuessDTO.getStatus(); // true = cộng thêm, false = ghi đè
+
+            if (existingCartOpt.isPresent()) {
+                cart = existingCartOpt.get();
+                switch (status ? 1 : 0) {
+                    case 1:
+                        cart.setQuantity(cart.getQuantity() + cartGuessDTO.getQuantity());
+                        break;
+                    case 0:
+                        cart.setQuantity(cartGuessDTO.getQuantity());
+                        break;
+                }
+                cart.setDateAdded(new Date().toInstant());
+            } else {
+                cart = new Cart();
+                cart.setDateAdded(new Date().toInstant());
+                cart.setIdProductDetail(productDetail);
+                cart.setIdUser(user);
+                cart.setQuantity(cartGuessDTO.getQuantity());
+            }
+
+            return new ResponseEntity<>(cartRepository.save(cart), HttpStatus.OK);
+
         } catch (Exception e) {
             e.printStackTrace();
+            return new ResponseEntity<>(new Cart(), HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity<>(new Cart(), HttpStatus.BAD_REQUEST);
     }
 
     @Override
