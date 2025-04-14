@@ -8,5 +8,5 @@ import lombok.Data;
 public class CompanyAdminDTO {
     private Integer id;
     private String name;
-    private Boolean status;
+    private boolean status;
 }

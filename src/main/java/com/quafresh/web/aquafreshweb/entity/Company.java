@@ -23,6 +23,6 @@ public class Company {
 
     @ColumnDefault("b'1'")
     @Column(name = "status")
-    private Boolean status;
+    private boolean status;
 
 }

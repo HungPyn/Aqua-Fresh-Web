@@ -18,6 +18,6 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     @Query("SELECT u FROM User u WHERE u.role = :role")
     List<User> findAllUsersByRole(@Param("role") boolean role);
 
-    @Query("SELECT u FROM User u WHERE u.role = :role AND LOWER(u.fullname) LIKE LOWER(CONCAT('%', :name, '%'))")
-    List<User> searchUserByFullnameContainingIgnoreCase(@Param("role") boolean role, @Param("name") String name);
+    @Query("SELECT u FROM User u WHERE u.role = :role AND LOWER(u.phone) LIKE LOWER(CONCAT('%', :name, '%'))")
+    List<User> searchUserByPhoneContainingIgnoreCase(@Param("role") boolean role, @Param("name") String name);
 }
