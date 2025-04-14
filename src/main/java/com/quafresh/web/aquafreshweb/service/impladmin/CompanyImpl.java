@@ -69,6 +69,7 @@ public class CompanyImpl implements CompanyService {
         Company company = companyRepository.findById(id).orElseThrow(()->new EntityNotFoundException("Company not found"));
         company.setName(companyAdminDTO.getName());
         company.setStatus(companyAdminDTO.isStatus());
+        company = companyRepository.save(company);
         return CompanyAdminDTO.builder()
                 .id(company.getId())
                 .name(company.getName())
