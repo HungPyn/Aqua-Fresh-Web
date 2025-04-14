@@ -7,6 +7,7 @@ import com.quafresh.web.aquafreshweb.service.admin.CustomerService;
 import com.quafresh.web.aquafreshweb.util.AdminMapper;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,6 +19,7 @@ import java.util.stream.Collectors;
 public class CustomerImpl implements CustomerService {
     private final UserRepository userRepository;
     private final AdminMapper adminMapper;
+    private final PasswordEncoder passwordEncoder;
     @Override
     public List<CustomerDTO> getAll() {
         List<User> listCustomer = userRepository.findAllUsersByRole(false);
@@ -30,7 +32,7 @@ public class CustomerImpl implements CustomerService {
     public CustomerDTO create(CustomerDTO customerDTO) {
         User customer = new User();
         customer.setUsername(customerDTO.getUsername());
-        customer.setPassword(customerDTO.getPassword());
+        customer.setPassword(passwordEncoder.encode("123456"));
         customer.setFullname(customerDTO.getFullname());
         customer.setPhone(customerDTO.getPhone());
         customer.setEmail(customerDTO.getEmail());
@@ -61,7 +63,7 @@ public class CustomerImpl implements CustomerService {
 
     @Override
     public List<CustomerDTO> search(String keyword) {
-      List<User> listCustomer = userRepository.searchUserByFullnameContainingIgnoreCase(false, keyword);
+      List<User> listCustomer = userRepository.searchUserByPhoneContainingIgnoreCase(false, keyword);
       return listCustomer.stream().map(adminMapper::toCustomerDTO).collect(Collectors.toList());
     }
 }

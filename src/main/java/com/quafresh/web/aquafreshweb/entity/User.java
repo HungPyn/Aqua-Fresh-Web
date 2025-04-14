@@ -11,6 +11,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 
 @Getter
 @Setter
@@ -32,6 +33,8 @@ public class User implements UserDetails {
     private String email;
     @Column(name = "phone_number")
     private String phone;
+    @Column(name = "day_creation")
+    private Date dayCreation;
     @Column(name = "address")
     private String address;
     @Column(name = "role")
