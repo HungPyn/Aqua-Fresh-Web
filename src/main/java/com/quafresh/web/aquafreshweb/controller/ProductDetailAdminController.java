@@ -39,4 +39,11 @@ public class ProductDetailAdminController {
         productDetailAdmin.delete(id);
         return ResponseEntity.ok("Product deleted successfully");
     }
+
+    @DeleteMapping("/images/{detailId}/{imageIndex}")
+    public ResponseEntity<?> deleteImage(@PathVariable Integer detailId, @PathVariable int imageIndex) {
+        productDetailAdmin.deleteImage(detailId, imageIndex);
+        return ResponseEntity.ok().build();
+    }
+
 }
