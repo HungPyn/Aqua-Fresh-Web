@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -74,12 +75,23 @@ public class OderGuessImpl implements OderGuessService {
 
 
     @Override
-    public BigDecimal updateTotalQuantity(Integer orderId) {
-        List<OrderDetail> details = orderDetailRepository.findByIdOrder_Id(orderId);
-
-        return details.stream()
-                .map(detail -> detail.getPrice().multiply(BigDecimal.valueOf(detail.getQuantity())))
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    public ResponseEntity<List<OrderDetailClientDTO>> getAll(Integer id) {
+        List<OrderTable> orderTable = orderTableRepository.findByIdUser(userRepository.findById(id).get());
+        List<OrderDetailClientDTO> orderDetailClientDTO =new ArrayList<>();
+        for (OrderTable odtb : orderTable){
+            OrderDetailClientDTO orderDetailClientDTO1 = new OrderDetailClientDTO();
+            orderDetailClientDTO1.setIdUser(id);
+            orderDetailClientDTO1.setShippingPrice(odtb.getShippingPrice());
+            orderDetailClientDTO1.setStatus(odtb.getStatus());
+            orderDetailClientDTO1.setTotal(odtb.getTotal());
+            orderDetailClientDTO1.
+                    setDetailGuessDTOList(orderDetailRepository.
+                            findByIdOrder_Id(orderTableRepository.findById(
+                                    userRepository.findById(odtb.getIdUser().getId()).get().getId()
+                            ).get().getId()));
+            orderDetailClientDTO.add(orderDetailClientDTO1);
+        }
+        return  ResponseEntity.ok(orderDetailClientDTO);
     }
 
 }

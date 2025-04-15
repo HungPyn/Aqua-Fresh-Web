@@ -4,8 +4,9 @@ import com.quafresh.web.aquafreshweb.dto.guess.OrderDetailClientDTO;
 import org.springframework.http.ResponseEntity;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 public interface OderGuessService {
     public ResponseEntity<String> addOrder(OrderDetailClientDTO orderDetailClientDTO);
-    public BigDecimal updateTotalQuantity(Integer orderId);
+    ResponseEntity<List<OrderDetailClientDTO>> getAll(Integer id);
 }
