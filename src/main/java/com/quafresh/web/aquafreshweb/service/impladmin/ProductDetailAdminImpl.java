@@ -159,18 +159,17 @@ public class ProductDetailAdminImpl implements ProductDetailAdminService {
 
     @Override
     @Transactional
-    public String deleteImage(Integer detailId, Integer imageId) {
+    public void deleteImage(Integer detailId, Integer imageId) {
         ProductDetail detail = productDetailRepository.findById(detailId)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy sản phẩm chi tiết"));
+                .orElseThrow(() -> new RuntimeException("Product detail not found"));
 
-        Picture imageToDelete = detail.getListUrl().stream()
-                .filter(pic -> pic.getId().equals(imageId))
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy ảnh cần xóa"));
+        List<Picture> pictures = detail.getListUrl();
+        if (pictures == null || imageId < 0 || imageId >= pictures.size()) {
+            throw new RuntimeException("Invalid image index");
+        }
 
-        detail.removePicture(imageToDelete);
-        productDetailRepository.save(detail);
-
-        return "Đã xóa ảnh khỏi sản phẩm chi tiết";
+        Picture pictureToRemove = pictures.get(imageId);
+        detail.removePicture(pictureToRemove); // chỉ remove ra khỏi list là đủ
     }
+
 }
