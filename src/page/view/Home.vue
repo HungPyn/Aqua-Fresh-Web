@@ -30,11 +30,7 @@
                 Đơn hàng
               </router-link>
             </li>
-            <li class="nav-item">
-              <router-link class="nav-link fw-bold fs-6" to="/hoaDonAdmin">
-                Hóa đơn
-              </router-link>
-            </li>
+
             <li class="nav-item">
               <router-link class="nav-link fw-bold fs-6" to="/discountAdmin">
                 Khuyến mãi
@@ -43,12 +39,6 @@
             <li class="nav-item">
               <router-link class="nav-link fw-bold fs-6" to="/productAdmin">
                 Sản phẩm
-              </router-link>
-            </li>
-
-            <li class="nav-item">
-              <router-link class="nav-link fw-bold fs-6" to="/userAdmin">
-                Khách hàng
               </router-link>
             </li>
           </ul>
@@ -90,7 +80,6 @@
               @keydown.enter.prevent="timKiem()"
               v-model="noiDung"
               class="form-control me-2"
-              type="search"
               placeholder="Tìm kiếm..."
               aria-label="Search"
             />

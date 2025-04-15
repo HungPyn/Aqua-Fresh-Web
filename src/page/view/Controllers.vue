@@ -388,8 +388,6 @@ import { useToast } from "vue-toastification";
 import Swal from "sweetalert2";
 const toast = useToast();
 
-//get user
-
 const truncateText = (text, maxLength) => {
   if (!text) return "";
   return text.length > maxLength ? text.substring(0, maxLength) + "..." : text;
@@ -451,6 +449,7 @@ onMounted(() => {
 const getUserFromSession = () => {
   const storedUser = sessionStorage.getItem("user");
   user.value = storedUser ? JSON.parse(storedUser) : null;
+  console.log("User từ session:", JSON.stringify(user.value, null, 2));
 };
 const user = ref(null);
 const isLogin = computed(() => !!user.value);
@@ -461,6 +460,7 @@ const themVaoGio = async (pd) => {
       idProductDetail: pd.id,
       quantity: 1,
       idUSer: user.value.id,
+      status: 1,
     };
     try {
       const response = await axios.post(

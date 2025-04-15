@@ -194,7 +194,7 @@
       <div class="modal-dialog modal-xl">
         <div class="modal-content rounded-0">
           <div class="modal-header">
-            <h5 class="modal-title">Xác nhận thông tin</h5>
+            <h5 class="modal-title">Xác nhận thanh toán</h5>
             <button
               type="button"
               class="btn-close"
@@ -297,10 +297,13 @@
 
               <div class="col-5">
                 <h5 class="mb-3 text-center">Thông tin</h5>
-                <form>
+                <form v-if="isLogin">
                   <div class="row mb-3">
                     <div class="col-6">
+                      <label for="fullname" class="form-label">Họ và tên</label>
                       <input
+                        disabled
+                        v-model="user.username"
                         type="text"
                         class="form-control border"
                         id="fullname"
@@ -308,7 +311,12 @@
                       />
                     </div>
                     <div class="col-6">
+                      <label for="fullname" class="form-label"
+                        >Số điện thoại</label
+                      >
                       <input
+                        disabled
+                        v-model="user.phone"
                         type="text"
                         class="form-control border"
                         id="phone"
@@ -318,28 +326,28 @@
                   </div>
 
                   <div class="mb-3">
+                    <label for="fullname" class="form-label">Email</label>
                     <input
+                      disabled
                       type="email"
                       class="form-control border"
                       id="email"
+                      v-model="user.email"
                       placeholder=" Email"
                     />
                   </div>
+                  <b for="fullname" class="form-label">Địa chỉ</b>
+                  <p>
+                    {{ user.address.wardName }},
+                    {{ user.address.district.districtName }}, Tỉnh
+                    {{ user.address.district.province.provinceName }}
+                  </p>
 
                   <div class="mb-3">
-                    <label for="address" class="form-label"
-                      >Tỉnh/Thành phố</label
-                    >
-                    <select class="form-select border" id="address">
-                      <option selected disabled>Chọn tỉnh/thành</option>
-                      <option value="01">Hà Nội</option>
-                      <option value="79">TP Hồ Chí Minh</option>
-                      <option value="48">Đà Nẵng</option>
-                    </select>
-                  </div>
-
-                  <div class="mb-3">
+                    <b for="fullname" class="form-label">Địa chỉ chi tiết</b>
                     <input
+                      v-model="user.specificAddress"
+                      disabled
                       type="text"
                       class="form-control border"
                       id="specificAddress"

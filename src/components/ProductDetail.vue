@@ -275,6 +275,7 @@ const themVaoGio = async (pd) => {
       idProductDetail: pd.id,
       quantity: soLuong.value,
       idUSer: user.value.id,
+      status: 1,
     };
     try {
       const response = await axios.post(
