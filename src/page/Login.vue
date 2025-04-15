@@ -347,7 +347,6 @@ const dangNhap = async () => {
     }
   } catch (error) {
     baoLoi.value = true;
-    console.log("Status:", error.response.status);
     console.log("Data:", error.response.data);
   }
 };

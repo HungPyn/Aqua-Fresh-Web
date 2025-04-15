@@ -179,6 +179,7 @@
           >
         </h4>
         <button
+          @click="getPriceShip"
           v-if="chonSanPham.length > 0"
           data-bs-toggle="modal"
           data-bs-target="#modalThanhToan"
@@ -360,14 +361,28 @@
                 <h6>
                   Tiền ship:
                   <b class="text-danger">
-                    {{ Number(44444444).toLocaleString("vi-VN") }} đ</b
+                    {{
+                      Number(responeGiaShip?.data.total_fee).toLocaleString(
+                        "vi-VN"
+                      )
+                    }}
+                    đ</b
                   >
                 </h6>
 
                 <h5>
                   Tổng:
                   <b class="text-danger"
-                    >{{ Number(8888888).toLocaleString("vi-VN") }} đ</b
+                    >{{
+                      Number(
+                        tongCong +
+                          (responeGiaShip?.data.total_fee &&
+                          responeGiaShip.data.total_fee > 0
+                            ? responeGiaShip.data.total_fee
+                            : 0)
+                      ).toLocaleString("vi-VN")
+                    }}
+                    đ</b
                   >
                 </h5>
               </div>
@@ -375,7 +390,11 @@
           </div>
 
           <div class="modal-footer">
-            <button type="button" class="btn btn-primary rounded-0">
+            <button
+              type="button"
+              class="btn btn-primary rounded-0"
+              @click="XacNhanThanhToan"
+            >
               Xác nhận
             </button>
           </div>
@@ -430,29 +449,32 @@ const giamSoLuong = (gh) => {
 };
 const updateSoLuong = async (gh) => {
   if (isLogin.value) {
-    // const gioHang = {
-    //   id: gh.id,
-    //   user: gh.user,
-    //   product: gh.product,
-    //   price: gh.price,
-    //   quantity: gh.quantity,
-    //   createdAt: gh.createdAt,
-    //   quantity: gh.quantity,
-    // };
-    // console.log(
-    //   "Dữ liệu gior hangf trước khi gửi:",
-    //   JSON.stringify(gioHang, null, 2)
-    // );
-    // try {
-    //   const res = await axios.put("http://localhost:8080/cart/update", gioHang);
-    //   console.log(res.data);
-    //   getCart();
-    // } catch (error) {
-    //   console.error("Lỗi:", error.response ? error.response.data : error);
-    // }
-    toast.success("Cập nhật số lượng thành công", {
-      timeout: 1000,
-    });
+    const gioHang = {
+      idProductDetail: gh.idProductDetail.id,
+      quantity: gh.quantity,
+      idUSer: gh.idUser.id,
+      status: 0,
+    };
+    try {
+      const response = await axios.post(
+        "http://localhost:8080/user/cart",
+        gioHang,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+          withCredentials: true,
+        }
+      );
+    } catch (error) {
+      console.error("Lỗi khi sửa số lượng giỏ hàng:", error);
+
+      if (error.response) {
+        console.error("Status:", error.response.status);
+        console.error("Data:", error.response.data);
+        toast.error(`Lỗi: ${error.response.data.message || "Có lỗi xảy ra!"}`);
+      }
+    }
   } else {
     const sessionCart = JSON.parse(sessionStorage.getItem("cart")) || [];
     const index = sessionCart.findIndex(
@@ -467,13 +489,15 @@ const updateSoLuong = async (gh) => {
 const cart = ref([]);
 
 const userId = "894de7e6-12c8-4387-94ad-05396cca268d";
-//chek usser
+//chek user
 const getUserFromSession = () => {
   const storedUser = sessionStorage.getItem("user");
   user.value = storedUser ? JSON.parse(storedUser) : null;
   console.log("User từ session:", JSON.stringify(user.value, null, 2));
 };
+
 const user = ref(null);
+
 const isLogin = computed(() => !!user.value);
 
 //lấy ra giỏ hàng
@@ -568,7 +592,120 @@ const tongCong = computed(() => {
   }, 0);
 });
 // thanh toán
-const thanhToan = async () => {};
+
+const responeGiaShip = ref(null);
+const getPriceShip = async () => {
+  if (isLogin.value) {
+    responeGiaShip.value = null;
+    const canNang = ref(
+      chonSanPham.value.reduce((total, item) => {
+        const quantity = item.quantity || 0;
+        return total + 5000 * quantity;
+      }, 0)
+    );
+    const soLuong = ref(canNang.value / 5000);
+    const donHang = ref({
+      payment_type_id: 2,
+      note: "Hàng dễ tổn thương! cẩn thận",
+      required_note: "KHONGCHOXEMHANG",
+      return_phone: "0378261550",
+      return_address: "39 NTT",
+      return_district_id: null,
+      return_ward_code: "",
+      client_order_code: "",
+      from_name: "AquaFreshShop",
+      from_phone: "0378261550",
+      from_address: "72 Thành Thái, Phường 14, Quận 10, Hồ Chí Minh, Vietnam",
+      from_ward_name: "Phường 15",
+      from_district_name: "Quận 10",
+      from_province_name: "HCM",
+      to_name: user.value?.username,
+      to_phone: user.value?.phone,
+      to_address: `${user.value?.specificAddress}, ${user.value?.address?.wardName}, ${user.value?.address?.district?.districtName}, ${user.value?.address?.district?.province?.provinceName}, Việt Nam`,
+      to_ward_name: user.value?.address?.wardName,
+      to_district_name: user.value?.address?.district?.districtName,
+      to_province_name: user.value?.address?.district?.province?.provinceName,
+      cod_amount: tongCong.value,
+      content: "Đơn hàng : máy lọc nước",
+      length: soLuong.value,
+      width: 150,
+      height: 150,
+      weight: canNang.value,
+      cod_failed_amount: 0,
+      pick_station_id: 1444,
+      deliver_station_id: null,
+      insurance_value: 5000000,
+      service_type_id: 2,
+      coupon: null,
+      pickup_time: 1692840132,
+      pick_shift: [2],
+      items: [
+        {
+          name: "blabal",
+          code: "locNuocVip",
+          quantity: 1,
+          price: 200000,
+          length: 12,
+          width: 12,
+          height: 12,
+          weight: 1200,
+          category: {
+            level1: "Áo",
+          },
+        },
+      ],
+    });
+    if (canNang.value > 50000) {
+      toast.error(
+        "Khối lượng hàng hóa không được lớn hơn 50kg (Tối đa 10 chiếc)"
+      );
+      return;
+    }
+    if (tongCong.value > 50000000) {
+      toast.error("Thanh toán 1 lần không quá 50 triệu");
+      return;
+    }
+    console.log("Dữ liệu gửi GHN:", JSON.stringify(donHang.value, null, 2));
+    try {
+      const response = await axios.post(
+        "https://online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/create",
+        donHang.value,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            ShopId: "5728798",
+            Token: "4d93b447-16b0-11f0-8078-2a002cd46251",
+          },
+        }
+      );
+      responeGiaShip.value = response.data;
+    } catch (error) {
+      console.error("Lỗi khi lấy giá ship:", error);
+    }
+  } else {
+    toast.error("Chưa đăng nhập", {
+      timeout: 1000,
+    });
+  }
+};
+//
+const XacNhanThanhToan = async () => {
+  if (isLogin.value) {
+    const filteredList = chonSanPham.value.map((item) => ({
+      price: item.price,
+      quantity: item.quantity,
+      productDetailId: item.productDetailId,
+    }));
+    try {
+    } catch (error) {
+      console.error("Lỗi khi thanh toán:", error);
+    }
+  } else {
+    toast.error("Chưa đanư nhậpnhập", {
+      timeout: 1000,
+    });
+  }
+};
 
 onMounted(() => {
   getUserFromSession();
