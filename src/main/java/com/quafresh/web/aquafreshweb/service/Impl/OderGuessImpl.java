@@ -1,6 +1,7 @@
 package com.quafresh.web.aquafreshweb.service.Impl;
 
 import com.quafresh.web.aquafreshweb.dto.guess.OrderDetailClientDTO;
+import com.quafresh.web.aquafreshweb.dto.guess.OrderDetailGuessDTO;
 import com.quafresh.web.aquafreshweb.entity.OrderDetail;
 import com.quafresh.web.aquafreshweb.entity.OrderTable;
 import com.quafresh.web.aquafreshweb.entity.ProductDetail;
@@ -10,10 +11,11 @@ import com.quafresh.web.aquafreshweb.repositories.OrderTableRepository;
 import com.quafresh.web.aquafreshweb.repositories.ProductDetailRepository;
 import com.quafresh.web.aquafreshweb.repositories.UserRepository;
 import com.quafresh.web.aquafreshweb.service.guess.OderGuessService;
-import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -30,49 +32,46 @@ public class OderGuessImpl implements OderGuessService {
     private final UserRepository userRepository;
 
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public ResponseEntity<String> addOrder(OrderDetailClientDTO orderDetailClientDTO) {
         try {
             // B1: Lấy thông tin user
-            Optional<User> user = userRepository.findById(orderDetailClientDTO.getIdUser());
-            if (user.isEmpty()) {
+            Optional<User> userOptional = userRepository.findById(orderDetailClientDTO.getIdUser());
+            if (userOptional.isEmpty()) {
                 return ResponseEntity.badRequest().body("User not found");
             }
+            User user = userOptional.get();
 
-            // B2: Tạo và lưu OrderTable (chưa có total)
+            // B2: Tạo đơn hàng (OrderTable)
             OrderTable orderTable = new OrderTable();
             orderTable.setOrderDate(new Date().toInstant());
-            orderTable.setIdUser(user.get());
+            orderTable.setIdUser(user);
             orderTable.setStatus(orderDetailClientDTO.getStatus());
-            orderTable.setShippingPrice(BigDecimal.valueOf(123123)); // hoặc tính sau
-            orderTable = orderTableRepository.save(orderTable); // cần lưu để có ID
+            orderTable.setShippingPrice(orderDetailClientDTO.getShippingPrice());
+            orderTable.setTotal(orderDetailClientDTO.getTotal());
+            orderTable = orderTableRepository.save(orderTable);
 
-            // B3: Tạo và lưu OrderDetail
-            ProductDetail productDetail = productDetailRepository.findById(orderDetailClientDTO.getIdProductDetail())
-                    .orElseThrow(() -> new RuntimeException("ProductDetail not found"));
-            OrderDetail orderDetail = new OrderDetail();
-            orderDetail.setIdOrder(orderTable);
-            orderDetail.setIdProductDetail(productDetail);
-            orderDetail.setPrice(orderDetailClientDTO.getPrice());
-            orderDetail.setQuantity(orderDetailClientDTO.getQuantity());
-            orderDetailRepository.save(orderDetail);
+            // B3: Lưu các OrderDetail
+            for (OrderDetailGuessDTO dto : orderDetailClientDTO.getDetailGuessDTOList()) {
+                ProductDetail productDetail = productDetailRepository.findById(dto.getProductDetailId())
+                        .orElseThrow(() -> new RuntimeException("ProductDetail with ID " + dto.getProductDetailId() + " not found"));
 
-            // B4: Cập nhật tồn kho (trừ số lượng)
-            int newQuantity = productDetail.getQuantity() - orderDetailClientDTO.getQuantity();
-            productDetail.setQuantity(newQuantity);
-            productDetailRepository.save(productDetail);
+                OrderDetail orderDetail = new OrderDetail();
+                orderDetail.setIdOrder(orderTable);
+                orderDetail.setIdProductDetail(productDetail);
+                orderDetail.setPrice(dto.getPrice());
+                orderDetail.setQuantity(dto.getQuantity());
 
-            // B5: Cập nhật total (sau khi orderDetail đã được lưu)
-            BigDecimal total = updateTotalQuantity(orderTable.getId());
-            orderTable.setTotal(total);
-            orderTableRepository.save(orderTable);
-
+                orderDetailRepository.save(orderDetail);
+            }
             return ResponseEntity.ok("Order created successfully");
         } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(500).body("Failed to create order");
-        }}
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly(); // ép rollback
+            return ResponseEntity.status(500).body("Failed to create order: " + e.getMessage());
+        }
+    }
+
 
     @Override
     public BigDecimal updateTotalQuantity(Integer orderId) {
@@ -83,8 +82,4 @@ public class OderGuessImpl implements OderGuessService {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
-    public int getTotalQuantityByProductDetailId(Integer productDetailId) {
-        List<OrderDetail> details = orderDetailRepository.findByIdProductDetail_Id(productDetailId);
-        return details.stream().mapToInt(OrderDetail::getQuantity).sum();
-    }
 }
