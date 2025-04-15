@@ -38,7 +38,7 @@ public class ProductAdminImpl implements ProductAdminService {
                         .name(product.getIdCompany().getName())
                         .status(product.getIdCompany().isStatus())
                         .build())
-                .status(product.getStatus())
+                .status(product.isStatus())
                 .build();
     }
 
@@ -50,7 +50,7 @@ public class ProductAdminImpl implements ProductAdminService {
                         CategoryAdminDTO.builder().id(product.getIdCategory().getId()).name(product.getIdCategory().getName()).status(product.getIdCategory().getStatus()).build() : null)
                 .idCompany(product.getIdCompany() != null ?
                         CompanyAdminDTO.builder().id(product.getIdCompany().getId()).name(product.getIdCompany().getName()).status(product.getIdCompany().isStatus()).build() : null)
-                .status(product.getStatus())
+                .status(product.isStatus())
                 .build()
         ).collect(Collectors.toList());
     }
@@ -82,7 +82,7 @@ public class ProductAdminImpl implements ProductAdminService {
         // Tạo mới sản phẩm
         Product product = new Product();
         product.setProductName(productAdminDTO.getName());
-        product.setStatus(productAdminDTO.getStatus());
+        product.setStatus(productAdminDTO.isStatus());
 
         // Lấy Category từ cơ sở dữ liệu
         Category category = catogoryRepository.findById(productAdminDTO.getIdCategory().getId())
@@ -109,7 +109,7 @@ public class ProductAdminImpl implements ProductAdminService {
 
         // Cập nhật thông tin sản phẩm
         product.setProductName(productAdminDTO.getName());
-        product.setStatus(productAdminDTO.getStatus());
+        product.setStatus(productAdminDTO.isStatus());
 
         // Lấy Category từ cơ sở dữ liệu
         Category category = catogoryRepository.findById(productAdminDTO.getIdCategory().getId())

@@ -1,5 +1,6 @@
 package com.quafresh.web.aquafreshweb.service.admin;
 
+import com.quafresh.web.aquafreshweb.dto.admin.PictureAdimDTO;
 import com.quafresh.web.aquafreshweb.dto.admin.ProductDetailAdminDTO;
 
 import java.util.List;
@@ -16,4 +17,5 @@ public interface ProductDetailAdminService {
     ProductDetailAdminDTO update(Integer id, ProductDetailAdminDTO productAdminDTO);
 
     String delete(Integer id);
+    String deleteImage(Integer detailId, Integer imageId);
 }

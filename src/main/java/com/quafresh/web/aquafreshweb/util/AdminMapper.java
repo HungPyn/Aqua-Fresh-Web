@@ -5,11 +5,14 @@ import com.quafresh.web.aquafreshweb.dto.LoginRequestDTO;
 import com.quafresh.web.aquafreshweb.dto.admin.*;
 import com.quafresh.web.aquafreshweb.entity.*;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.Mappings;
 import org.mapstruct.factory.Mappers;
 
 @Mapper(componentModel = "spring")
 public interface AdminMapper {
 
+    @Mappings({@Mapping(source = "productName", target = "name")})
     ProductAdminDTO toProductAdminDTO(Product product);
 
     ColorAdminDtO toColorAdminDTO(Color color);
