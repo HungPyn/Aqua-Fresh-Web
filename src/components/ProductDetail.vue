@@ -120,7 +120,9 @@
             <div class="d-flex justify-content-between">
               <button
                 class="btn btn-danger flex-grow-1 me-2 rounded-0"
-                @click="mua(product)"
+                @click="getPriceShip"
+                data-bs-toggle="modal"
+                data-bs-target="#modalThanhToan"
               >
                 Mua
               </button>
@@ -217,6 +219,200 @@
         </div>
       </div>
     </div>
+
+    <!-- //medel thanhtoansthanhtoansgh////////////////////////////////////////////////////////// -->
+
+    <div
+      v-if="product && product.idProduct"
+      class="modal fade"
+      id="modalThanhToan"
+      tabindex="-1"
+    >
+      <div class="modal-dialog modal-xl">
+        <div class="modal-content rounded-0">
+          <div class="modal-header">
+            <h5 class="modal-title">Xác nhận thanh toán</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+            ></button>
+          </div>
+
+          <div class="modal-body">
+            <div class="row">
+              <div class="col-7">
+                <div
+                  style="background-color: aliceblue"
+                  class="p-2 mb-2 shadow-sm"
+                >
+                  <div class="row align-items-center">
+                    <!-- Hình ảnh và tên sản phẩm -->
+                    <div class="col-md-3 text-center">
+                      <img
+                        :src="product.listUrl?.[0]?.urlImage"
+                        class="img-fluid rounded"
+                        style="max-height: 100px; width: auto"
+                        alt="Product Image"
+                      />
+                    </div>
+                    <div class="col-md-9">
+                      <h6
+                        class="card-title mb-0 fs-6"
+                        style="font-size: 0.9rem"
+                      >
+                        {{ product.idProduct.productName }}
+                      </h6>
+
+                      <div
+                        class="col-md-12 text-center mt-2 d-flex justify-content-between"
+                        style="padding-left: 0px; padding-right: 0px"
+                      >
+                        <div
+                          class="px-2"
+                          style="
+                            flex-grow: 1;
+                            text-align: left;
+                            margin-right: 10px;
+                          "
+                        >
+                          <p class="mb-0" style="font-size: 0.8rem">
+                            Số lượng: <b>{{ soLuong }}</b>
+                          </p>
+                        </div>
+
+                        <div
+                          class="px-2"
+                          style="
+                            flex-grow: 1;
+                            text-align: right;
+                            margin-left: 10px;
+                          "
+                        >
+                          <p class="mb-0" style="font-size: 0.8rem">
+                            <b>Giá: </b>
+                            <b
+                              class="text-danger"
+                              v-if="product.idDiscount?.discountValue === 0"
+                            >
+                              {{
+                                Number(product.price).toLocaleString("vi-VN")
+                              }}đ
+                            </b>
+                            <b class="text-danger" v-else>
+                              {{
+                                Number(
+                                  product.price -
+                                    product.idDiscount.discountValue
+                                ).toLocaleString("vi-VN")
+                              }}đ
+                            </b>
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-5">
+                <h5 class="mb-3 text-center">Thông tin</h5>
+                <form v-if="isLogin">
+                  <div class="row mb-3">
+                    <div class="col-6">
+                      <label class="form-label">Họ và tên</label>
+                      <input
+                        disabled
+                        v-model="user.username"
+                        type="text"
+                        class="form-control border"
+                        placeholder=" Họ và tên"
+                      />
+                    </div>
+                    <div class="col-6">
+                      <label class="form-label">Số điện thoại</label>
+                      <input
+                        disabled
+                        v-model="user.phone"
+                        type="text"
+                        class="form-control border"
+                        placeholder=" Số điện thoại"
+                      />
+                    </div>
+                  </div>
+
+                  <div class="mb-3">
+                    <label class="form-label">Email</label>
+                    <input
+                      disabled
+                      type="email"
+                      class="form-control border"
+                      v-model="user.email"
+                      placeholder=" Email"
+                    />
+                  </div>
+                  <b class="form-label">Địa chỉ</b>
+                  <p>
+                    {{ user.address.wardName }},
+                    {{ user.address.district.districtName }}, Tỉnh
+                    {{ user.address.district.province.provinceName }}
+                  </p>
+
+                  <div class="mb-3">
+                    <b class="form-label">Địa chỉ chi tiết</b>
+                    <input
+                      v-model="user.specificAddress"
+                      disabled
+                      type="text"
+                      class="form-control border"
+                      placeholder=" Địa chỉ chi tiết"
+                    />
+                  </div>
+                </form>
+                <br />
+                <hr />
+                <h6>
+                  Tiền ship:
+                  <b class="text-danger">
+                    {{
+                      Number(
+                        responeGiaShip?.data.total_fee || 0
+                      ).toLocaleString("vi-VN")
+                    }}
+                    đ
+                  </b>
+                </h6>
+
+                <h5>
+                  Tổng:
+                  <b class="text-danger">
+                    {{
+                      Number(
+                        (product.price -
+                          (product.idDiscount?.discountValue || 0)) *
+                          soLuong +
+                          (responeGiaShip?.data.total_fee || 0)
+                      ).toLocaleString("vi-VN")
+                    }}
+                    đ
+                  </b>
+                </h5>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-primary rounded-0"
+              @click="XacNhanThanhToan"
+            >
+              Xác nhận
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 <script setup>
@@ -255,11 +451,6 @@ watch(product, (newVal) => {
     selectedImage.value = newVal.listUrl[0].urlImage;
   }
 });
-
-//// mua
-const mua = async (pd) => {
-  sessionStorage.removeItem("cart");
-};
 
 //chek usser
 const getUserFromSession = () => {
@@ -347,7 +538,6 @@ const getOneProduct = async () => {
     fullProduct.value = res.data;
     // console.log("product là:", JSON.stringify(fullProduct.value, null, 2));
     product.value = fullProduct.value.productDetail;
-    // console.log("product ok là:", JSON.stringify(product.value, null, 2));
   } catch (error) {
     console.error("Lỗi khi gọi 1 product:", error);
   }
@@ -411,11 +601,166 @@ onMounted(async () => {
     console.error("Lỗi khi tải dữ liệu:", error);
   }
 });
+//thanh toán
+const XacNhanThanhToan = async () => {
+  if (isLogin.value) {
+    if (
+      responeGiaShip.value?.data?.total_fee == null ||
+      isNaN(responeGiaShip.value.data.total_fee) ||
+      Number(responeGiaShip.value.data.total_fee) === 0
+    ) {
+      toast.error("Đơn hàng không hợp lệ!", {
+        timeout: 1500,
+      });
+      return;
+    }
+    const detailGuessDTOList = [
+      {
+        price:
+          product.value.price - (product.value.idDiscount?.discountValue || 0),
+        quantity: soLuong.value,
+        productDetailId: product.value.id,
+      },
+    ];
+    const order = {
+      total:
+        (product.value.price - (product.value.idDiscount?.discountValue || 0)) *
+          soLuong.value +
+        responeGiaShip.value.data.total_fee,
+      idUser: user.value.id,
+      status: "Pending",
+      shippingPrice: responeGiaShip.value.data.total_fee,
+      detailGuessDTOList: detailGuessDTOList,
+    };
+
+    Swal.fire({
+      title: "Xác nhận đặt hàng?",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Có",
+      cancelButtonText: "Không",
+    }).then(async (result) => {
+      // Cần async ở đây vì có await bên trong
+      if (result.isConfirmed) {
+        try {
+          const response = await axios.post(
+            "http://localhost:8080/order",
+            order
+          );
+          console.log("Đơn hàng đã được tạo:", response.data);
+          toast.success("Đặt hàng thành công", {});
+
+          document.querySelector(".btn-close")?.click();
+        } catch (error) {
+          console.error("Lỗi khi thanh toán:", error);
+        }
+      }
+    });
+  } else {
+    toast.error("Chưa đăng nhập", {
+      timeout: 1000,
+    });
+  }
+};
+
 watch(
   () => props.id,
   () => {
     getOneProduct(); // Khi ID thay đổi, lấy sản phẩm mới
   }
 );
+
+///gia ship
+
+const responeGiaShip = ref(null);
+const getPriceShip = async () => {
+  if (isLogin.value) {
+    responeGiaShip.value = null;
+    const donHang = ref({
+      payment_type_id: 2,
+      note: "Hàng dễ tổn thương! cẩn thận",
+      required_note: "KHONGCHOXEMHANG",
+      return_phone: "0378261550",
+      return_address: "39 NTT",
+      return_district_id: null,
+      return_ward_code: "",
+      client_order_code: "",
+      from_name: "AquaFreshShop",
+      from_phone: "0378261550",
+      from_address: "72 Thành Thái, Phường 14, Quận 10, Hồ Chí Minh, Vietnam",
+      from_ward_name: "Phường 15",
+      from_district_name: "Quận 10",
+      from_province_name: "HCM",
+      to_name: user.value?.username,
+      to_phone: user.value?.phone,
+      to_address: `${user.value?.specificAddress}, ${user.value?.address?.wardName}, ${user.value?.address?.district?.districtName}, ${user.value?.address?.district?.province?.provinceName}, Việt Nam`,
+      to_ward_name: user.value?.address?.wardName,
+      to_district_name: user.value?.address?.district?.districtName,
+      to_province_name: user.value?.address?.district?.province?.provinceName,
+      cod_amount:
+        product.value.price * soLuong.value -
+        (product.value.idDiscount?.discountValue || 0), ////
+      content: "Đơn hàng : máy lọc nước",
+      length: soLuong.value,
+      width: 150,
+      height: 150,
+      weight: soLuong.value * 5000,
+      cod_failed_amount: 0,
+      pick_station_id: 1444,
+      deliver_station_id: null,
+      insurance_value: 5000000,
+      service_type_id: 2,
+      coupon: null,
+      pickup_time: 1692840132,
+      pick_shift: [2],
+      items: [
+        {
+          name: "blabal",
+          code: "locNuocVip",
+          quantity: 1,
+          price: 200000,
+          length: 12,
+          width: 12,
+          height: 12,
+          weight: 1200,
+          category: {
+            level1: "Áo",
+          },
+        },
+      ],
+    });
+    if (soLuong.value * 5000 > 50000) {
+      toast.error(
+        "Khối lượng hàng hóa không được lớn hơn 50kg (Tối đa 10 chiếc)"
+      );
+      return;
+    }
+    if (product.value.price * soLuong.value > 50000000) {
+      toast.error("Thanh toán 1 lần không quá 50 triệu");
+      return;
+    }
+    //console.log("dia chi gui di:", JSON.stringify(donHang.value, null, 2));
+    try {
+      const response = await axios.post(
+        "https://online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/create",
+        donHang.value,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            ShopId: "5728798",
+            Token: "4d93b447-16b0-11f0-8078-2a002cd46251",
+          },
+        }
+      );
+      responeGiaShip.value = response.data;
+    } catch (error) {
+      console.error("Lỗi khi lấy giá ship:", error);
+    }
+  } else {
+    toast.error("Chưa đăng nhập", {
+      timeout: 1000,
+    });
+  }
+};
 </script>
 <style scoped></style>

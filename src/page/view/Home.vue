@@ -80,6 +80,7 @@
               @keydown.enter.prevent="timKiem()"
               v-model="noiDung"
               class="form-control me-2"
+              type="search"
               placeholder="Tìm kiếm..."
               aria-label="Search"
             />

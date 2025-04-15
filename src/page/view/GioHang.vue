@@ -362,9 +362,9 @@
                   Tiền ship:
                   <b class="text-danger">
                     {{
-                      Number(responeGiaShip?.data.total_fee).toLocaleString(
-                        "vi-VN"
-                      )
+                      Number(
+                        responeGiaShip?.data.total_fee || 0
+                      ).toLocaleString("vi-VN")
                     }}
                     đ</b
                   >
@@ -493,7 +493,6 @@ const userId = "894de7e6-12c8-4387-94ad-05396cca268d";
 const getUserFromSession = () => {
   const storedUser = sessionStorage.getItem("user");
   user.value = storedUser ? JSON.parse(storedUser) : null;
-  console.log("User từ session:", JSON.stringify(user.value, null, 2));
 };
 
 const user = ref(null);
@@ -573,6 +572,22 @@ const xoaGioHang = async (gh) => {
         }
       }
     });
+  }
+};
+//xóa gioHang them oder
+const xoaGioSauOder = async (id) => {
+  try {
+    const response = await axios.delete(
+      `http://localhost:8080/user/cart/delete/${id}`,
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        withCredentials: true,
+      }
+    );
+  } catch (error) {
+    console.error("Lỗi khi xóa giỏ hàng sau odder:", error);
   }
 };
 // list để đã chọn để thanh
@@ -665,7 +680,7 @@ const getPriceShip = async () => {
       toast.error("Thanh toán 1 lần không quá 50 triệu");
       return;
     }
-    console.log("Dữ liệu gửi GHN:", JSON.stringify(donHang.value, null, 2));
+
     try {
       const response = await axios.post(
         "https://online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/create",
@@ -691,17 +706,61 @@ const getPriceShip = async () => {
 //
 const XacNhanThanhToan = async () => {
   if (isLogin.value) {
-    const filteredList = chonSanPham.value.map((item) => ({
-      price: item.price,
-      quantity: item.quantity,
-      productDetailId: item.productDetailId,
-    }));
-    try {
-    } catch (error) {
-      console.error("Lỗi khi thanh toán:", error);
+    if (
+      responeGiaShip.value?.data?.total_fee == null ||
+      isNaN(responeGiaShip.value.data.total_fee) ||
+      Number(responeGiaShip.value.data.total_fee) === 0
+    ) {
+      toast.error("Đơn hàng không hợp lệ!", {
+        timeout: 1500,
+      });
+      return;
     }
+    const detailGuessDTOList = chonSanPham.value.map((item) => ({
+      price:
+        item.idProductDetail.price -
+        item.idProductDetail.idDiscount.discountValue,
+      quantity: item.quantity,
+      productDetailId: item.idProductDetail.id,
+    }));
+    const order = {
+      total: tongCong.value + responeGiaShip.value.data.total_fee,
+      idUser: user.value.id,
+      status: "Pending",
+      shippingPrice: responeGiaShip.value.data.total_fee,
+      detailGuessDTOList: detailGuessDTOList,
+    };
+
+    Swal.fire({
+      title: "Xác nhận đặt hàng?",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Có",
+      cancelButtonText: "Không",
+    }).then(async (result) => {
+      // Cần async ở đây vì có await bên trong
+      if (result.isConfirmed) {
+        try {
+          const response = await axios.post(
+            "http://localhost:8080/order",
+            order
+          );
+          console.log("Đơn hàng đã được tạo:", response.data);
+          toast.success("Đặt hàng thành công", {});
+
+          // Xóa giỏ hàng sau khi đặt hàng thành công
+          for (const item of chonSanPham.value) {
+            await xoaGioSauOder(item.id);
+          }
+          getCart();
+          document.querySelector(".btn-close")?.click();
+        } catch (error) {
+          console.error("Lỗi khi thanh toán:", error);
+        }
+      }
+    });
   } else {
-    toast.error("Chưa đanư nhậpnhập", {
+    toast.error("Chưa đăng nhập", {
       timeout: 1000,
     });
   }
