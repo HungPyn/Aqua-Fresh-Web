@@ -17,5 +17,5 @@ public interface ProductDetailAdminService {
     ProductDetailAdminDTO update(Integer id, ProductDetailAdminDTO productAdminDTO);
 
     String delete(Integer id);
-    String deleteImage(Integer detailId, Integer imageId);
+    void deleteImage(Integer detailId, Integer imageId);
 }
