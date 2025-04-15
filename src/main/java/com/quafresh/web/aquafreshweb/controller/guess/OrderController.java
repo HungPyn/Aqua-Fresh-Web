@@ -1,14 +1,14 @@
 package com.quafresh.web.aquafreshweb.controller.guess;
 
 import com.quafresh.web.aquafreshweb.dto.guess.OrderDetailClientDTO;
+import com.quafresh.web.aquafreshweb.entity.OrderDetail;
 import com.quafresh.web.aquafreshweb.service.Impl.OderGuessImpl;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RequestMapping("/order")
 @AllArgsConstructor
@@ -20,5 +20,9 @@ public class OrderController {
     @PostMapping
     public ResponseEntity<String> addOrder (@RequestBody OrderDetailClientDTO orderDetailClientDTO){
         return  orOderGuess.addOrder(orderDetailClientDTO);
+    }
+    @GetMapping("/{id}")
+    public ResponseEntity<List<OrderDetailClientDTO>> getAllOrderTableById(@PathVariable Integer id){
+        return orOderGuess.getAll(id);
     }
 }

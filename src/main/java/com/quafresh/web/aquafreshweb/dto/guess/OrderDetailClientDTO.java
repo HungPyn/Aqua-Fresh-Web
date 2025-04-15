@@ -6,23 +6,22 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
-import java.time.Instant;
+import java.util.List;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class OrderDetailClientDTO {
-    private Integer id;
-    private BigDecimal price;
-    private Integer quantity;
-    private Integer idProductDetail;
+    private BigDecimal total;
     private Integer idUser;
     private String status;
-    public OrderDetailClientDTO(OrderDetail orderDetail) {
-        this.id = orderDetail.getId();
-        this.price = orderDetail.getPrice();
-        this.quantity = orderDetail.getQuantity();
-        this.idProductDetail = orderDetail.getIdProductDetail().getId();
+    private BigDecimal shippingPrice;
+    private List<OrderDetailGuessDTO> detailGuessDTOList;
+    public OrderDetailClientDTO(OrderDetail orderDetail, List<OrderDetailGuessDTO> list) {
+        this.total = orderDetail.getPrice();
         this.idUser = orderDetail.getIdOrder().getIdUser().getId();
         this.status = orderDetail.getIdOrder().getStatus();
+        this.detailGuessDTOList = list;
+        this.shippingPrice = orderDetail.getIdOrder().getShippingPrice();
     }
 }

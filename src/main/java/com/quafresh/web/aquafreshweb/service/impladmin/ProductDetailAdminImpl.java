@@ -173,5 +173,4 @@ public class ProductDetailAdminImpl implements ProductDetailAdminService {
 
         return "Đã xóa ảnh khỏi sản phẩm chi tiết";
     }
-
 }
