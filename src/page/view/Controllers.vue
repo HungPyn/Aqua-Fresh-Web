@@ -511,7 +511,7 @@ const themVaoGio = async (pd) => {
       // Lưu lại giỏ hàng
 
       sessionStorage.setItem("cart", JSON.stringify(cart));
-      console.log("Cart hiện tại:", JSON.stringify(cart, null, 2));
+      // console.log("Cart hiện tại:", JSON.stringify(cart, null, 2));
       toast.success("Đã thêm vào giỏ hàng (tạm thời)!", {
         timeout: 1000,
       });

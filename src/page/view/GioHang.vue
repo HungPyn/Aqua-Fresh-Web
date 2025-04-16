@@ -356,6 +356,99 @@
                     />
                   </div>
                 </form>
+                <form v-if="!isLogin">
+                  <div class="row mb-3">
+                    <div class="col-6">
+                      <label class="form-label">Họ và tên</label>
+                      <input
+                        v-model="diaChiChuaDangNhap.name"
+                        type="text"
+                        class="form-control border"
+                        placeholder=" Họ và tên"
+                      />
+                    </div>
+                    <div class="col-6">
+                      <label class="form-label">Số điện thoại</label>
+                      <input
+                        v-model="diaChiChuaDangNhap.phone"
+                        type="text"
+                        class="form-control border"
+                        placeholder=" Số điện thoại"
+                      />
+                    </div>
+                  </div>
+
+                  <div class="mb-3">
+                    <label class="form-label">Email</label>
+                    <input
+                      type="email"
+                      class="form-control border"
+                      v-model="diaChiChuaDangNhap.email"
+                      placeholder=" Email"
+                    />
+                  </div>
+                  <b class="form-label">Địa chỉ</b>
+                  <div class="mb-3 d-flex justify-content-between">
+                    <div class="me-2 w-100">
+                      <label class="form-label">Tỉnh/Thành phố</label>
+                      <select
+                        v-model="idTinh"
+                        class="form-select"
+                        @change="getHuyen()"
+                      >
+                        <option
+                          :value="tinh.id"
+                          v-for="tinh in tinh"
+                          :key="tinh.id"
+                        >
+                          {{ tinh.provinceName }}
+                        </option>
+                      </select>
+                    </div>
+                    <div class="mx-2 w-100">
+                      <label class="form-label">Quận/Huyện</label>
+                      <select
+                        v-model="idHuyen"
+                        @change="getXa"
+                        class="form-select"
+                      >
+                        <option
+                          :value="huyen.id"
+                          v-for="huyen in huyen"
+                          :key="huyen.id"
+                        >
+                          {{ huyen.districtName }}
+                        </option>
+                      </select>
+                    </div>
+                    <div class="ms-2 w-100">
+                      <label class="form-label">Phường/Xã</label>
+                      <select v-model="idXa" class="form-select">
+                        <option :value="xa.id" v-for="xa in xa" :key="xa.id">
+                          {{ xa.wardName }}
+                        </option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div class="mb-3">
+                    <b class="form-label">Địa chỉ chi tiết</b>
+                    <input
+                      v-model="diaChiChuaDangNhap.diaChiChiTiet"
+                      type="text"
+                      class="form-control border"
+                      placeholder=" Địa chỉ chi tiết"
+                    />
+                  </div>
+
+                  <button
+                    type="button"
+                    class="btn btn-primary rounded-0"
+                    @click="checkGiaChuaDangNhap"
+                  >
+                    Xác nhận địa chỉ
+                  </button>
+                </form>
                 <br />
                 <hr />
                 <h6>
@@ -698,7 +791,7 @@ const getPriceShip = async () => {
       console.error("Lỗi khi lấy giá ship:", error);
     }
   } else {
-    toast.error("Chưa đăng nhập", {
+    toast.warning("Điền thông tin địa chỉ", {
       timeout: 1000,
     });
   }
@@ -740,35 +833,265 @@ const XacNhanThanhToan = async () => {
     }).then(async (result) => {
       // Cần async ở đây vì có await bên trong
       if (result.isConfirmed) {
-        try {
-          const response = await axios.post(
-            "http://localhost:8080/order",
-            order
-          );
-          console.log("Đơn hàng đã được tạo:", response.data);
-          toast.success("Đặt hàng thành công", {});
-
-          // Xóa giỏ hàng sau khi đặt hàng thành công
-          for (const item of chonSanPham.value) {
-            await xoaGioSauOder(item.id);
-          }
-          getCart();
-          document.querySelector(".btn-close")?.click();
-        } catch (error) {
-          console.error("Lỗi khi thanh toán:", error);
-        }
+        addOrder(order);
       }
     });
   } else {
-    toast.error("Chưa đăng nhập", {
-      timeout: 1000,
+    if (
+      responeGiaShip.value?.data?.total_fee == null ||
+      isNaN(responeGiaShip.value.data.total_fee) ||
+      Number(responeGiaShip.value.data.total_fee) === 0
+    ) {
+      toast.error("Vui lòng xác nhận địa chỉ!", {
+        timeout: 1500,
+      });
+      return;
+    }
+    const detailGuessDTOList = chonSanPham.value.map((item) => ({
+      price:
+        item.idProductDetail.price -
+        item.idProductDetail.idDiscount.discountValue,
+      quantity: item.quantity,
+      productDetailId: item.idProductDetail.id,
+    }));
+    const order = {
+      total: tongCong.value + responeGiaShip.value.data.total_fee,
+      idUser: null,
+      status: "Pending",
+      shippingPrice: responeGiaShip.value.data.total_fee,
+      detailGuessDTOList: detailGuessDTOList,
+    };
+
+    Swal.fire({
+      title: "Xác nhận đặt hàng?",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Có",
+      cancelButtonText: "Không",
+    }).then(async (result) => {
+      // Cần async ở đây vì có await bên trong
+      if (result.isConfirmed) {
+        console.log("order là:", JSON.stringify(order, null, 2));
+        addOrder(order);
+      }
     });
+  }
+};
+const addOrder = async (order) => {
+  try {
+    const response = await axios.post("http://localhost:8080/order", order);
+    console.log("Đơn hàng đã được tạo:", response.data);
+    toast.success("Đặt hàng thành công", {});
+    document.querySelector(".btn-close")?.click();
+  } catch (error) {
+    console.error("Lỗi khi thanh toán:", error);
+  }
+};
+
+//dia chi chua dang nhap
+
+const diaChiChuaDangNhap = ref({
+  name: "",
+  phone: "",
+  email: "",
+  xa: null,
+  huyen: null,
+  tinh: null,
+  diaChiChiTiet: "",
+});
+//lay gia chua dan nhap
+const checkGiaChuaDangNhap = async () => {
+  if (!isLogin.value) {
+    responeGiaShip.value = null;
+    const canNang = ref(
+      chonSanPham.value.reduce((total, item) => {
+        const quantity = item.quantity || 0;
+        return total + 5000 * quantity;
+      }, 0)
+    );
+    const soLuong = ref(canNang.value / 5000);
+    const donHang = ref({
+      payment_type_id: 2,
+      note: "Hàng dễ tổn thương! cẩn thận",
+      required_note: "KHONGCHOXEMHANG",
+      return_phone: "0378261550",
+      return_address: "39 NTT",
+      return_district_id: null,
+      return_ward_code: "",
+      client_order_code: "",
+      from_name: "AquaFreshShop",
+      from_phone: "0378261550",
+      from_address: "72 Thành Thái, Phường 14, Quận 10, Hồ Chí Minh, Vietnam",
+      from_ward_name: "Phường 15",
+      from_district_name: "Quận 10",
+      from_province_name: "HCM",
+      to_name: diaChiChuaDangNhap.value.name,
+      to_phone: diaChiChuaDangNhap.value.phone,
+      to_address: `${diaChiChuaDangNhap.value.diaChiChiTiet}, ${diaChiChuaDangNhap.value.xa}, ${diaChiChuaDangNhap.value.huyen}, ${diaChiChuaDangNhap.value.tinh}, Việt Nam`,
+      to_ward_name: diaChiChuaDangNhap.value.xa,
+      to_district_name: diaChiChuaDangNhap.value.huyen,
+      to_province_name: diaChiChuaDangNhap.value.tinh,
+      cod_amount: tongCong.value,
+      content: "Đơn hàng : máy lọc nước",
+      length: soLuong.value,
+      width: 150,
+      height: 150,
+      weight: canNang.value,
+      cod_failed_amount: 0,
+      pick_station_id: 1444,
+      deliver_station_id: null,
+      insurance_value: 5000000,
+      service_type_id: 2,
+      coupon: null,
+      pickup_time: 1692840132,
+      pick_shift: [2],
+      items: [
+        {
+          name: "blabal",
+          code: "locNuocVip",
+          quantity: 1,
+          price: 200000,
+          length: 12,
+          width: 12,
+          height: 12,
+          weight: 1200,
+          category: {
+            level1: "Áo",
+          },
+        },
+      ],
+    });
+    if (
+      diaChiChuaDangNhap.value.xa == null ||
+      diaChiChuaDangNhap.value.huyen == null ||
+      diaChiChuaDangNhap.value.tinh == null
+    ) {
+      toast.error("Địa chỉ không hợp lệ");
+      return;
+    }
+    if (
+      !diaChiChuaDangNhap.value.phone ||
+      diaChiChuaDangNhap.value.phone.length < 10 ||
+      diaChiChuaDangNhap.value.phone.length > 11 ||
+      !diaChiChuaDangNhap.value.phone.startsWith("03")
+    ) {
+      toast.error("Số điện thoại không hợp lệ");
+      return;
+    }
+    if (
+      diaChiChuaDangNhap.value.diaChiChiTiet == null ||
+      diaChiChuaDangNhap.value.diaChiChiTiet.length < 5
+    ) {
+      toast.error("Địa chỉ chi tiết không hợp lệ");
+      return;
+    }
+    if (
+      diaChiChuaDangNhap.value.name == null ||
+      diaChiChuaDangNhap.value.name.length < 5
+    ) {
+      toast.error("Tên không hợp lệ");
+      return;
+    }
+    if (canNang.value > 50000) {
+      toast.error(
+        "Khối lượng hàng hóa không được lớn hơn 50kg (Tối đa 10 chiếc)"
+      );
+      return;
+    }
+    if (tongCong.value > 50000000) {
+      toast.error("Thanh toán 1 lần không quá 50 triệu");
+      return;
+    }
+    // console.log("dia chi gui di:", JSON.stringify(donHang.value, null, 2));
+    try {
+      const response = await axios.post(
+        "https://online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/create",
+        donHang.value,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            ShopId: "5728798",
+            Token: "4d93b447-16b0-11f0-8078-2a002cd46251",
+          },
+        }
+      );
+      responeGiaShip.value = response.data;
+    } catch (error) {
+      console.error("Lỗi khi lấy giá ship:", error);
+    }
+  }
+};
+//lấy địa chỉ ra hazzz
+const idTinh = ref();
+const idHuyen = ref();
+const idXa = ref();
+
+const tinh = ref([]);
+const huyen = ref([]);
+const xa = ref([]);
+// Hàm tìm tên dựa theo ID
+const tenTinh = computed(() => {
+  const t = tinh.value.find((item) => item.id === idTinh.value);
+  return t ? t.provinceName : "";
+});
+const tenHuyen = computed(() => {
+  const h = huyen.value.find((item) => item.id === idHuyen.value);
+  return h ? h.districtName : "";
+});
+const tenXa = computed(() => {
+  const x = xa.value.find((item) => item.id === idXa.value);
+  return x ? x.wardName : "";
+});
+
+// Tự động gán tên vào object địa chỉ khi chọn
+watch(tenTinh, (newVal) => {
+  diaChiChuaDangNhap.value.tinh = newVal;
+});
+watch(tenHuyen, (newVal) => {
+  diaChiChuaDangNhap.value.huyen = newVal;
+});
+watch(tenXa, (newVal) => {
+  diaChiChuaDangNhap.value.xa = newVal;
+});
+
+const getTinh = async () => {
+  try {
+    const res = await axios.get("http://localhost:8080/address/province");
+
+    tinh.value = res.data;
+    // console.log("tinh la", JSON.stringify(tinh.value, null, 2));
+  } catch (error) {
+    console.error(error);
+  }
+};
+const getHuyen = async () => {
+  try {
+    console.log("id tinh la", idTinh.value);
+    const res = await axios.post("http://localhost:8080/address/district", {
+      id: idTinh.value,
+    });
+    console.log(res.data);
+    huyen.value = res.data;
+  } catch (error) {
+    console.error(error);
+  }
+};
+const getXa = async () => {
+  try {
+    const res = await axios.post("http://localhost:8080/address/ward", {
+      id: idHuyen.value,
+    });
+    console.log(res.data);
+    xa.value = res.data;
+  } catch (error) {
+    console.error(error);
   }
 };
 
 onMounted(() => {
   getUserFromSession();
   getCart();
+  getTinh();
 });
 </script>
 <style scoped>
