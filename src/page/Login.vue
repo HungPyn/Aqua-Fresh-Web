@@ -255,7 +255,12 @@ const dangKyTaiKhoan = async () => {
   } else {
     tbConfirmPassword.value = false;
   }
-  if (taiKhoan.value.phone.length > 11 || taiKhoan.value.phone.length < 1) {
+  if (
+    !taiKhoan.value.phone ||
+    taiKhoan.value.phone.length < 10 ||
+    taiKhoan.value.phone.length > 11 ||
+    !taiKhoan.value.phone.startsWith("03")
+  ) {
     tbphone.value = true;
     return;
   } else {

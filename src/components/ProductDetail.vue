@@ -8,6 +8,7 @@
             :src="selectedImage"
             class="img-fluid rounded shadow-sm"
             alt="Product Image"
+            style="height: 400px; margin: 10px"
           />
           <!-- Ảnh nhỏ phía dưới -->
           <div class="col-12 d-flex flex-wrap gap-2">
@@ -171,7 +172,7 @@
               <img
                 :src="pd.images[0]"
                 class="img-fluid"
-                style="height: 260px; margin: 10px"
+                style="height: 245px; margin: 10px"
               />
             </router-link>
 
