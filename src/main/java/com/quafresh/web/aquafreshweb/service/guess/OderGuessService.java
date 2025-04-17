@@ -9,4 +9,6 @@ import java.util.List;
 public interface OderGuessService {
     public ResponseEntity<String> addOrder(OrderDetailClientDTO orderDetailClientDTO);
     ResponseEntity<List<OrderDetailClientDTO>> getAll(Integer id);
+
+    ResponseEntity<String> deleteOrderIfPending(Integer id);
 }
