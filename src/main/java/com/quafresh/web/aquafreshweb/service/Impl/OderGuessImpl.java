@@ -84,14 +84,37 @@ public class OderGuessImpl implements OderGuessService {
             orderDetailClientDTO1.setShippingPrice(odtb.getShippingPrice());
             orderDetailClientDTO1.setStatus(odtb.getStatus());
             orderDetailClientDTO1.setTotal(odtb.getTotal());
-            orderDetailClientDTO1.
-                    setDetailGuessDTOList(orderDetailRepository.
-                            findByIdOrder_Id(orderTableRepository.findById(
-                                    userRepository.findById(odtb.getIdUser().getId()).get().getId()
-                            ).get().getId()));
+            orderDetailClientDTO1.setDetailGuessDTOList(orderDetailRepository.findByIdOrder_Id(odtb.getId(),OrderDetailGuessDTO.class));
             orderDetailClientDTO.add(orderDetailClientDTO1);
         }
         return  ResponseEntity.ok(orderDetailClientDTO);
     }
+
+    @Override
+    public ResponseEntity<String> deleteOrderIfPending(Integer id) {
+        Optional<OrderTable> optionalOrder = orderTableRepository.findById(id);
+        if (optionalOrder.isEmpty()) {
+            return ResponseEntity.badRequest().body("Order không tồn tại");
+        }
+
+        OrderTable order = optionalOrder.get();
+        if (!"PENDING".equals(order.getStatus())) {
+            return ResponseEntity.badRequest().body("Order không ở trạng thái PENDING");
+        }
+
+        List<OrderDetail> orderDetails = orderDetailRepository.findByIdOrder_Id(id, OrderDetail.class);
+        if (orderDetails.isEmpty()) {
+            return ResponseEntity.badRequest().body("Null value in OrderDetails");
+        }
+
+        for (OrderDetail detail : orderDetails) {
+            orderDetailRepository.deleteById(detail.getId());
+        }
+
+        orderTableRepository.deleteById(order.getId());
+
+        return ResponseEntity.ok("Xoá thành công");
+    }
+
 
 }

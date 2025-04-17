@@ -25,4 +25,8 @@ public class OrderController {
     public ResponseEntity<List<OrderDetailClientDTO>> getAllOrderTableById(@PathVariable Integer id){
         return orOderGuess.getAll(id);
     }
+    @PostMapping("/{id}")
+    public ResponseEntity<String> deleteOrderIfPending(@PathVariable Integer id){
+        return orOderGuess.deleteOrderIfPending(id);
+    }
 }

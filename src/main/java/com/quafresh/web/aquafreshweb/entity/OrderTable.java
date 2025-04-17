@@ -1,5 +1,6 @@
 package com.quafresh.web.aquafreshweb.entity;
 
+import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -18,8 +19,9 @@ public class OrderTable {
     @Column(name = "ID", nullable = false)
     private Integer id;
 
-    @ManyToOne(fetch = FetchType.EAGER,optional = false)
+    @ManyToOne(fetch = FetchType.EAGER,optional = true)
     @JoinColumn(name = "id_user", nullable = false)
+
     private User idUser;
 
     @ColumnDefault("CURRENT_TIMESTAMP")
