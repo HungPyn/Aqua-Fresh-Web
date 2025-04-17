@@ -179,7 +179,6 @@
           >
         </h4>
         <button
-          @click="getPriceShip"
           v-if="chonSanPham.length > 0"
           data-bs-toggle="modal"
           data-bs-target="#modalThanhToan"
@@ -199,6 +198,7 @@
             <button
               type="button"
               class="btn-close"
+              @click="handleClose"
               data-bs-dismiss="modal"
             ></button>
           </div>
@@ -337,24 +337,66 @@
                       placeholder=" Email"
                     />
                   </div>
-                  <b for="fullname" class="form-label">Địa chỉ</b>
-                  <p>
-                    {{ user.address.wardName }},
-                    {{ user.address.district.districtName }}, Tỉnh
-                    {{ user.address.district.province.provinceName }}
-                  </p>
-
+                  <b class="form-label">Địa chỉ</b>
+                  <div class="mb-3 d-flex justify-content-between">
+                    <div class="me-2 w-100">
+                      <label class="form-label">Tỉnh/Thành phố</label>
+                      <select
+                        v-model="idTinh"
+                        class="form-select"
+                        @change="getHuyen()"
+                      >
+                        <option
+                          :value="tinh.id"
+                          v-for="tinh in tinh"
+                          :key="tinh.id"
+                        >
+                          {{ tinh.provinceName }}
+                        </option>
+                      </select>
+                    </div>
+                    <div class="mx-2 w-100">
+                      <label class="form-label">Quận/Huyện</label>
+                      <select
+                        v-model="idHuyen"
+                        @change="getXa"
+                        class="form-select"
+                      >
+                        <option
+                          :value="huyen.id"
+                          v-for="huyen in huyen"
+                          :key="huyen.id"
+                        >
+                          {{ huyen.districtName }}
+                        </option>
+                      </select>
+                    </div>
+                    <div class="ms-2 w-100">
+                      <label class="form-label">Phường/Xã</label>
+                      <select v-model="idXa" class="form-select">
+                        <option :value="xa.id" v-for="xa in xa" :key="xa.id">
+                          {{ xa.wardName }}
+                        </option>
+                      </select>
+                    </div>
+                  </div>
                   <div class="mb-3">
-                    <b for="fullname" class="form-label">Địa chỉ chi tiết</b>
+                    <b class="form-label">Địa chỉ chi tiết</b>
                     <input
-                      v-model="user.specificAddress"
-                      disabled
+                      v-model="diaChiChiTietLayGia"
                       type="text"
                       class="form-control border"
-                      id="specificAddress"
                       placeholder=" Địa chỉ chi tiết"
                     />
                   </div>
+
+                  <button
+                    type="button"
+                    class="btn btn-primary rounded-0"
+                    @click="getPriceShip"
+                  >
+                    Xác nhận địa chỉ
+                  </button>
                 </form>
                 <form v-if="!isLogin">
                   <div class="row mb-3">
@@ -455,9 +497,9 @@
                   Tiền ship:
                   <b class="text-danger">
                     {{
-                      Number(
-                        responeGiaShip?.data.total_fee || 0
-                      ).toLocaleString("vi-VN")
+                      Number(responeGiaShip?.data.total || 0).toLocaleString(
+                        "vi-VN"
+                      )
                     }}
                     đ</b
                   >
@@ -469,9 +511,9 @@
                     >{{
                       Number(
                         tongCong +
-                          (responeGiaShip?.data.total_fee &&
-                          responeGiaShip.data.total_fee > 0
-                            ? responeGiaShip.data.total_fee
+                          (responeGiaShip?.data.total &&
+                          responeGiaShip.data.total > 0
+                            ? responeGiaShip.data.total
                             : 0)
                       ).toLocaleString("vi-VN")
                     }}
@@ -713,60 +755,106 @@ const getPriceShip = async () => {
     );
     const soLuong = ref(canNang.value / 5000);
     const donHang = ref({
-      payment_type_id: 2,
-      note: "Hàng dễ tổn thương! cẩn thận",
-      required_note: "KHONGCHOXEMHANG",
-      return_phone: "0378261550",
-      return_address: "39 NTT",
-      return_district_id: null,
-      return_ward_code: "",
-      client_order_code: "",
-      from_name: "AquaFreshShop",
-      from_phone: "0378261550",
-      from_address: "72 Thành Thái, Phường 14, Quận 10, Hồ Chí Minh, Vietnam",
-      from_ward_name: "Phường 15",
-      from_district_name: "Quận 10",
-      from_province_name: "HCM",
-      to_name: user.value?.username,
-      to_phone: user.value?.phone,
-      to_address: `${user.value?.specificAddress}, ${user.value?.address?.wardName}, ${user.value?.address?.district?.districtName}, ${user.value?.address?.district?.province?.provinceName}, Việt Nam`,
-      to_ward_name: user.value?.address?.wardName,
-      to_district_name: user.value?.address?.district?.districtName,
-      to_province_name: user.value?.address?.district?.province?.provinceName,
-      cod_amount: tongCong.value,
-      content: "Đơn hàng : máy lọc nước",
+      service_type_id: 2,
+      from_district_id: 1442,
+      from_ward_code: "21211",
+      to_district_id: toDistrictId.value,
+      to_ward_code: String(toWardCode.value),
       length: soLuong.value,
-      width: 150,
+      width: 200,
       height: 150,
       weight: canNang.value,
-      cod_failed_amount: 0,
-      pick_station_id: 1444,
-      deliver_station_id: null,
-      insurance_value: 5000000,
-      service_type_id: 2,
+      insurance_value: 0,
       coupon: null,
-      pickup_time: 1692840132,
-      pick_shift: [2],
       items: [
         {
-          name: "blabal",
-          code: "locNuocVip",
+          name: "maylocnuoc",
           quantity: 1,
-          price: 200000,
-          length: 12,
-          width: 12,
-          height: 12,
-          weight: 1200,
-          category: {
-            level1: "Áo",
-          },
+          length: 200,
+          width: 200,
+          height: 200,
+          weight: 1000,
         },
       ],
     });
+    // const donHang = ref({
+    //   payment_type_id: 2,
+    //   note: "Hàng dễ tổn thương! cẩn thận",
+    //   required_note: "KHONGCHOXEMHANG",
+    //   return_phone: "0378261550",
+    //   return_address: "39 NTT",
+    //   return_district_id: null,
+    //   return_ward_code: "",
+    //   client_order_code: "",
+    //   from_name: "AquaFreshShop",
+    //   from_phone: "0378261550",
+    //   from_address: "72 Thành Thái, Phường 14, Quận 10, Hồ Chí Minh, Vietnam",
+    //   from_ward_name: "Phường 15",
+    //   from_district_name: "Quận 10",
+    //   from_province_name: "HCM",
+    //   to_name: user.value?.username,
+    //   to_phone: user.value?.phone,
+    //   to_address: `${user.value?.specificAddress}, ${user.value?.address?.wardName}, ${user.value?.address?.district?.districtName}, ${user.value?.address?.district?.province?.provinceName}, Việt Nam`,
+    //   to_ward_name: user.value?.address?.wardName,
+    //   to_district_name: user.value?.address?.district?.districtName,
+    //   to_province_name: user.value?.address?.district?.province?.provinceName,
+    //   cod_amount: tongCong.value,
+    //   content: "Đơn hàng : máy lọc nước",
+    //   length: soLuong.value,
+    //   width: 150,
+    //   height: 150,
+    //   weight: canNang.value,
+    //   cod_failed_amount: 0,
+    //   pick_station_id: 1444,
+    //   deliver_station_id: null,
+    //   insurance_value: 5000000,
+    //   service_type_id: 2,
+    //   coupon: null,
+    //   pickup_time: 1692840132,
+    //   pick_shift: [2],
+    //   items: [
+    //     {
+    //       name: "blabal",
+    //       code: "locNuocVip",
+    //       quantity: 1,
+    //       price: 200000,
+    //       length: 12,
+    //       width: 12,
+    //       height: 12,
+    //       weight: 1200,
+    //       category: {
+    //         level1: "Áo",
+    //       },
+    //     },
+    //   ],
+    // });
     if (canNang.value > 50000) {
       toast.error(
         "Khối lượng hàng hóa không được lớn hơn 50kg (Tối đa 10 chiếc)"
       );
+      return;
+    }
+    if (diaChiChiTietLayGia.value.length < 5) {
+      toast.error("Vui lòng nhập địa chỉ chi tiết");
+      return;
+    }
+    if (
+      toDistrictId.value &&
+      !isNaN(toDistrictId.value) &&
+      toDistrictId.value !== ""
+    ) {
+      // Kiểm tra mã quận (district_id) là một số hợp lệ và không trống
+      const toDistrictIdValue = Number(toDistrictId.value); // Chuyển đổi sang số
+      if (toDistrictIdValue <= 0) {
+        toast.error("Vui lòng chọn quận/huyện");
+        return;
+      }
+    }
+
+    // Kiểm tra mã phường (ward_code) không trống và là chuỗi hợp lệ
+    const toWardCodeValue = String(toWardCode.value); // Chuyển mã phường thành chuỗi và loại bỏ khoảng trắng
+    if (toWardCodeValue === "") {
+      toast.error("Vui lòng chọn xã/phường.");
       return;
     }
     if (tongCong.value > 50000000) {
@@ -775,8 +863,9 @@ const getPriceShip = async () => {
     }
 
     try {
+      // console.log("ĐỊa chỉ hui di là:", JSON.stringify(donHang.value, null, 2));
       const response = await axios.post(
-        "https://online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/create",
+        "https://online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/fee",
         donHang.value,
         {
           headers: {
@@ -797,14 +886,18 @@ const getPriceShip = async () => {
   }
 };
 //
+const diaChiChiTietLayGia = ref("");
+const handleClose = () => {
+  responeGiaShip.value = null;
+};
 const XacNhanThanhToan = async () => {
   if (isLogin.value) {
     if (
-      responeGiaShip.value?.data?.total_fee == null ||
-      isNaN(responeGiaShip.value.data.total_fee) ||
-      Number(responeGiaShip.value.data.total_fee) === 0
+      responeGiaShip.value?.data?.total == null ||
+      isNaN(responeGiaShip.value.data.total) ||
+      Number(responeGiaShip.value.data.total) === 0
     ) {
-      toast.error("Đơn hàng không hợp lệ!", {
+      toast.error("Vui lòng xác nhận địa chỉ", {
         timeout: 1500,
       });
       return;
@@ -816,13 +909,19 @@ const XacNhanThanhToan = async () => {
       quantity: item.quantity,
       productDetailId: item.idProductDetail.id,
     }));
-    const order = {
-      total: tongCong.value + responeGiaShip.value.data.total_fee,
+    const donHang = {
+      total: tongCong.value + responeGiaShip.value.data.total,
       idUser: user.value.id,
       status: "Pending",
-      shippingPrice: responeGiaShip.value.data.total_fee,
+      shippingPrice: responeGiaShip.value.data.total,
       detailGuessDTOList: detailGuessDTOList,
     };
+    // console.log("odder là:", JSON.stringify(donHang, null, 2));
+    // console.log(
+    //   "Gio hang la:",
+    //   JSON.stringify(cart.value, null, 2),
+    //   cart.value
+    // );
 
     Swal.fire({
       title: "Xác nhận đặt hàng?",
@@ -833,48 +932,61 @@ const XacNhanThanhToan = async () => {
     }).then(async (result) => {
       // Cần async ở đây vì có await bên trong
       if (result.isConfirmed) {
-        addOrder(order);
+        await addOrder(donHang);
+        for (const detail of donHang.detailGuessDTOList) {
+          const itemTrongGio = cart.value.find(
+            (item) => item.idProductDetail.id === detail.productDetailId
+          );
+
+          if (itemTrongGio) {
+            await xoaGioSauOder(itemTrongGio.id); // Xóa theo id của giỏ hàng
+          }
+        }
+        getCart();
       }
     });
   } else {
-    if (
-      responeGiaShip.value?.data?.total_fee == null ||
-      isNaN(responeGiaShip.value.data.total_fee) ||
-      Number(responeGiaShip.value.data.total_fee) === 0
-    ) {
-      toast.error("Vui lòng xác nhận địa chỉ!", {
-        timeout: 1500,
-      });
-      return;
-    }
-    const detailGuessDTOList = chonSanPham.value.map((item) => ({
-      price:
-        item.idProductDetail.price -
-        item.idProductDetail.idDiscount.discountValue,
-      quantity: item.quantity,
-      productDetailId: item.idProductDetail.id,
-    }));
-    const order = {
-      total: tongCong.value + responeGiaShip.value.data.total_fee,
-      idUser: null,
-      status: "Pending",
-      shippingPrice: responeGiaShip.value.data.total_fee,
-      detailGuessDTOList: detailGuessDTOList,
-    };
-
-    Swal.fire({
-      title: "Xác nhận đặt hàng?",
-      icon: "question",
-      showCancelButton: true,
-      confirmButtonText: "Có",
-      cancelButtonText: "Không",
-    }).then(async (result) => {
-      // Cần async ở đây vì có await bên trong
-      if (result.isConfirmed) {
-        console.log("order là:", JSON.stringify(order, null, 2));
-        addOrder(order);
-      }
+    toast.warning("Vui lòng đăng nhập", {
+      timeout: 1000,
     });
+    // if (
+    //   responeGiaShip.value?.data?.total == null ||
+    //   isNaN(responeGiaShip.value.data.total) ||
+    //   Number(responeGiaShip.value.data.total) === 0
+    // ) {
+    //   toast.error("Vui lòng xác nhận địa chỉ!", {
+    //     timeout: 1500,
+    //   });
+    //   return;
+    // }
+    // const detailGuessDTOList = chonSanPham.value.map((item) => ({
+    //   price:
+    //     item.idProductDetail.price -
+    //     item.idProductDetail.idDiscount.discountValue,
+    //   quantity: item.quantity,
+    //   productDetailId: item.idProductDetail.id,
+    // }));
+    // const order = {
+    //   total: tongCong.value + responeGiaShip.value.data.total,
+    //   idUser: null,
+    //   status: "Pending",
+    //   shippingPrice: responeGiaShip.value.data.total,
+    //   detailGuessDTOList: detailGuessDTOList,
+    // };
+    // Swal.fire({
+    //   title: "Xác nhận đặt hàng?",
+    //   icon: "question",
+    //   showCancelButton: true,
+    //   confirmButtonText: "Có",
+    //   cancelButtonText: "Không",
+    // }).then(async (result) => {
+    //   // Cần async ở đây vì có await bên trong
+    //   if (result.isConfirmed) {
+    //     console.log("order là:", JSON.stringify(order, null, 2));
+    //     addOrder(order);
+    //     responeGiaShip.value = null;
+    //   }
+    // });
   }
 };
 const addOrder = async (order) => {
@@ -901,125 +1013,128 @@ const diaChiChuaDangNhap = ref({
 });
 //lay gia chua dan nhap
 const checkGiaChuaDangNhap = async () => {
-  if (!isLogin.value) {
-    responeGiaShip.value = null;
-    const canNang = ref(
-      chonSanPham.value.reduce((total, item) => {
-        const quantity = item.quantity || 0;
-        return total + 5000 * quantity;
-      }, 0)
-    );
-    const soLuong = ref(canNang.value / 5000);
-    const donHang = ref({
-      payment_type_id: 2,
-      note: "Hàng dễ tổn thương! cẩn thận",
-      required_note: "KHONGCHOXEMHANG",
-      return_phone: "0378261550",
-      return_address: "39 NTT",
-      return_district_id: null,
-      return_ward_code: "",
-      client_order_code: "",
-      from_name: "AquaFreshShop",
-      from_phone: "0378261550",
-      from_address: "72 Thành Thái, Phường 14, Quận 10, Hồ Chí Minh, Vietnam",
-      from_ward_name: "Phường 15",
-      from_district_name: "Quận 10",
-      from_province_name: "HCM",
-      to_name: diaChiChuaDangNhap.value.name,
-      to_phone: diaChiChuaDangNhap.value.phone,
-      to_address: `${diaChiChuaDangNhap.value.diaChiChiTiet}, ${diaChiChuaDangNhap.value.xa}, ${diaChiChuaDangNhap.value.huyen}, ${diaChiChuaDangNhap.value.tinh}, Việt Nam`,
-      to_ward_name: diaChiChuaDangNhap.value.xa,
-      to_district_name: diaChiChuaDangNhap.value.huyen,
-      to_province_name: diaChiChuaDangNhap.value.tinh,
-      cod_amount: tongCong.value,
-      content: "Đơn hàng : máy lọc nước",
-      length: soLuong.value,
-      width: 150,
-      height: 150,
-      weight: canNang.value,
-      cod_failed_amount: 0,
-      pick_station_id: 1444,
-      deliver_station_id: null,
-      insurance_value: 5000000,
-      service_type_id: 2,
-      coupon: null,
-      pickup_time: 1692840132,
-      pick_shift: [2],
-      items: [
-        {
-          name: "blabal",
-          code: "locNuocVip",
-          quantity: 1,
-          price: 200000,
-          length: 12,
-          width: 12,
-          height: 12,
-          weight: 1200,
-          category: {
-            level1: "Áo",
-          },
-        },
-      ],
-    });
-    if (
-      diaChiChuaDangNhap.value.xa == null ||
-      diaChiChuaDangNhap.value.huyen == null ||
-      diaChiChuaDangNhap.value.tinh == null
-    ) {
-      toast.error("Địa chỉ không hợp lệ");
-      return;
-    }
-    if (
-      !diaChiChuaDangNhap.value.phone ||
-      diaChiChuaDangNhap.value.phone.length < 10 ||
-      diaChiChuaDangNhap.value.phone.length > 11 ||
-      !diaChiChuaDangNhap.value.phone.startsWith("03")
-    ) {
-      toast.error("Số điện thoại không hợp lệ");
-      return;
-    }
-    if (
-      diaChiChuaDangNhap.value.diaChiChiTiet == null ||
-      diaChiChuaDangNhap.value.diaChiChiTiet.length < 5
-    ) {
-      toast.error("Địa chỉ chi tiết không hợp lệ");
-      return;
-    }
-    if (
-      diaChiChuaDangNhap.value.name == null ||
-      diaChiChuaDangNhap.value.name.length < 5
-    ) {
-      toast.error("Tên không hợp lệ");
-      return;
-    }
-    if (canNang.value > 50000) {
-      toast.error(
-        "Khối lượng hàng hóa không được lớn hơn 50kg (Tối đa 10 chiếc)"
-      );
-      return;
-    }
-    if (tongCong.value > 50000000) {
-      toast.error("Thanh toán 1 lần không quá 50 triệu");
-      return;
-    }
-    // console.log("dia chi gui di:", JSON.stringify(donHang.value, null, 2));
-    try {
-      const response = await axios.post(
-        "https://online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/create",
-        donHang.value,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            ShopId: "5728798",
-            Token: "4d93b447-16b0-11f0-8078-2a002cd46251",
-          },
-        }
-      );
-      responeGiaShip.value = response.data;
-    } catch (error) {
-      console.error("Lỗi khi lấy giá ship:", error);
-    }
-  }
+  // if (!isLogin.value) {
+  //   responeGiaShip.value = null;
+  //   const canNang = ref(
+  //     chonSanPham.value.reduce((total, item) => {
+  //       const quantity = item.quantity || 0;
+  //       return total + 5000 * quantity;
+  //     }, 0)
+  //   );
+  //   const soLuong = ref(canNang.value / 5000);
+  //   const donHang = ref({
+  //     payment_type_id: 2,
+  //     note: "Hàng dễ tổn thương! cẩn thận",
+  //     required_note: "KHONGCHOXEMHANG",
+  //     return_phone: "0378261550",
+  //     return_address: "39 NTT",
+  //     return_district_id: null,
+  //     return_ward_code: "",
+  //     client_order_code: "",
+  //     from_name: "AquaFreshShop",
+  //     from_phone: "0378261550",
+  //     from_address: "72 Thành Thái, Phường 14, Quận 10, Hồ Chí Minh, Vietnam",
+  //     from_ward_name: "Phường 15",
+  //     from_district_name: "Quận 10",
+  //     from_province_name: "HCM",
+  //     to_name: diaChiChuaDangNhap.value.name,
+  //     to_phone: diaChiChuaDangNhap.value.phone,
+  //     to_address: `${diaChiChuaDangNhap.value.diaChiChiTiet}, ${diaChiChuaDangNhap.value.xa}, ${diaChiChuaDangNhap.value.huyen}, ${diaChiChuaDangNhap.value.tinh}, Việt Nam`,
+  //     to_ward_name: diaChiChuaDangNhap.value.xa,
+  //     to_district_name: diaChiChuaDangNhap.value.huyen,
+  //     to_province_name: diaChiChuaDangNhap.value.tinh,
+  //     cod_amount: tongCong.value,
+  //     content: "Đơn hàng : máy lọc nước",
+  //     length: soLuong.value,
+  //     width: 150,
+  //     height: 150,
+  //     weight: canNang.value,
+  //     cod_failed_amount: 0,
+  //     pick_station_id: 1444,
+  //     deliver_station_id: null,
+  //     insurance_value: 5000000,
+  //     service_type_id: 2,
+  //     coupon: null,
+  //     pickup_time: 1692840132,
+  //     pick_shift: [2],
+  //     items: [
+  //       {
+  //         name: "blabal",
+  //         code: "locNuocVip",
+  //         quantity: 1,
+  //         price: 200000,
+  //         length: 12,
+  //         width: 12,
+  //         height: 12,
+  //         weight: 1200,
+  //         category: {
+  //           level1: "Áo",
+  //         },
+  //       },
+  //     ],
+  //   });
+  //   if (
+  //     diaChiChuaDangNhap.value.xa == null ||
+  //     diaChiChuaDangNhap.value.huyen == null ||
+  //     diaChiChuaDangNhap.value.tinh == null
+  //   ) {
+  //     toast.error("Địa chỉ không hợp lệ");
+  //     return;
+  //   }
+  //   if (
+  //     !diaChiChuaDangNhap.value.phone ||
+  //     diaChiChuaDangNhap.value.phone.length < 10 ||
+  //     diaChiChuaDangNhap.value.phone.length > 11 ||
+  //     !diaChiChuaDangNhap.value.phone.startsWith("03")
+  //   ) {
+  //     toast.error("Số điện thoại không hợp lệ");
+  //     return;
+  //   }
+  //   if (
+  //     diaChiChuaDangNhap.value.diaChiChiTiet == null ||
+  //     diaChiChuaDangNhap.value.diaChiChiTiet.length < 5
+  //   ) {
+  //     toast.error("Địa chỉ chi tiết không hợp lệ");
+  //     return;
+  //   }
+  //   if (
+  //     diaChiChuaDangNhap.value.name == null ||
+  //     diaChiChuaDangNhap.value.name.length < 5
+  //   ) {
+  //     toast.error("Tên không hợp lệ");
+  //     return;
+  //   }
+  //   if (canNang.value > 50000) {
+  //     toast.error(
+  //       "Khối lượng hàng hóa không được lớn hơn 50kg (Tối đa 10 chiếc)"
+  //     );
+  //     return;
+  //   }
+  //   if (tongCong.value > 50000000) {
+  //     toast.error("Thanh toán 1 lần không quá 50 triệu");
+  //     return;
+  //   }
+  //   // console.log("dia chi gui di:", JSON.stringify(donHang.value, null, 2));
+  //   try {
+  //     const response = await axios.post(
+  //       "https://online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/create",
+  //       donHang.value,
+  //       {
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //           ShopId: "5728798",
+  //           Token: "4d93b447-16b0-11f0-8078-2a002cd46251",
+  //         },
+  //       }
+  //     );
+  //     responeGiaShip.value = response.data;
+  //   } catch (error) {
+  //     console.error("Lỗi khi lấy giá ship:", error);
+  //   }
+  // }
+  toast.warning("Vui lòng đăng nhập", {
+    timeout: 1000,
+  });
 };
 //lấy địa chỉ ra hazzz
 const idTinh = ref();
@@ -1052,6 +1167,15 @@ watch(tenHuyen, (newVal) => {
 });
 watch(tenXa, (newVal) => {
   diaChiChuaDangNhap.value.xa = newVal;
+});
+const toDistrictId = computed(() => {
+  const h = huyen.value.find((item) => item.id === idHuyen.value);
+  return h ? h.districtIdApi : null;
+});
+
+const toWardCode = computed(() => {
+  const x = xa.value.find((item) => item.id === idXa.value);
+  return x?.wardIdApi?.toString() || "";
 });
 
 const getTinh = async () => {
