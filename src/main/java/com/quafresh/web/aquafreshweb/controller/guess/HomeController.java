@@ -38,17 +38,17 @@ public class HomeController {
     }
 
     @GetMapping("/search")
-//    public ResponseEntity<List<ProductDetailGuessDTO>> search(
-//            @RequestParam(required = false) Integer technologyId,
-//            @RequestParam(required = false) String productName,
-//            @RequestParam(required = false) BigDecimal priceFrom,
-//            @RequestParam(required = false) BigDecimal priceTo
-//    ) {
-//        return pictureGuessService.getAllPictureProductDetail(technologyId, productName, priceFrom, priceTo);
-//    }
-    public ResponseEntity<List<ProductDetailAdminDTO>> searchByProductName(@Param("keyword") String keyword) {
-        return ResponseEntity.ok(productDetail.searchByProductName(keyword));
+    public ResponseEntity<List<ProductDetailGuessDTO>> search(
+            @RequestParam(required = false) Integer technologyId,
+            @RequestParam(required = false) String productName,
+            @RequestParam(required = false) BigDecimal priceFrom,
+            @RequestParam(required = false) BigDecimal priceTo
+    ) {
+        return pictureGuessService.getAllPictureProductDetail(technologyId, productName, priceFrom, priceTo);
     }
+//    public ResponseEntity<List<ProductDetailAdminDTO>> searchByProductName(@Param("keyword") String keyword) {
+//        return ResponseEntity.ok(productDetail.searchByProductName(keyword));
+//    }
     @GetMapping("/best-selling")
     public List<BestSellingProductDTO> getBestSellingProducts() {
         return productDetail.getBestSellingProducts();

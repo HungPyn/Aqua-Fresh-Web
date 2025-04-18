@@ -3,6 +3,8 @@ package com.quafresh.web.aquafreshweb.service;
 import com.quafresh.web.aquafreshweb.dto.LoginDTO;
 import com.quafresh.web.aquafreshweb.dto.LoginRequestDTO;
 import com.quafresh.web.aquafreshweb.dto.RegisterDTO;
+import com.quafresh.web.aquafreshweb.dto.guess.UpdateAddressDTO;
+import com.quafresh.web.aquafreshweb.dto.guess.WardGuessDTO;
 import com.quafresh.web.aquafreshweb.entity.User;
 import com.quafresh.web.aquafreshweb.entity.Ward;
 import com.quafresh.web.aquafreshweb.repositories.UserRepository;
@@ -87,5 +89,14 @@ public class AuthService implements UserDetailsService {
         User me = (User) principal;
         return adminMapper.toLoginRequestDTO(me);
     }
+
+//    public void update(Integer id,UpdateAddressDTO updateAddressDTO) {
+//        User user = userRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+//        user.setPhone(updateAddressDTO.getPhone());
+//        user.setSpecificAddress(updateAddressDTO.getSpecificAddress());
+//        Ward ward = wardRepository.findById(updateAddressDTO.getWard().getId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Ward not found"));
+//        user.setAddress(ward);
+//        userRepository.save(user);
+//    }
 
 }

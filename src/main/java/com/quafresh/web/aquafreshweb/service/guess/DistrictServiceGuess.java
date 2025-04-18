@@ -7,5 +7,5 @@ import org.springframework.http.ResponseEntity;
 import java.util.List;
 
 public interface DistrictServiceGuess {
-    public ResponseEntity<List<District>> getDistrictByProvinceId(IdRequest id);
+    public ResponseEntity<List<District>> getDistrictByProvinceId(Integer id);
 }

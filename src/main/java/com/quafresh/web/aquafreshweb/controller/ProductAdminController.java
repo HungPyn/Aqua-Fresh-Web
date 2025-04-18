@@ -3,6 +3,7 @@ package com.quafresh.web.aquafreshweb.controller;
 import com.quafresh.web.aquafreshweb.dto.admin.ProductAdminDTO;
 import com.quafresh.web.aquafreshweb.service.admin.ProductAdminService;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -19,9 +20,19 @@ public class ProductAdminController {
 
     // Lấy tất cả sản phẩm
     @GetMapping
-    public ResponseEntity<List<ProductAdminDTO>> getAllProducts() {
-        List<ProductAdminDTO> products = productAdminService.getAll();
-        return ResponseEntity.ok(products);
+    public ResponseEntity<?> getAllProducts() {
+        try {
+            // Gọi service để lấy danh sách sản phẩm
+            List<ProductAdminDTO> products = productAdminService.getAll();
+            return ResponseEntity.ok(products);
+        } catch (Exception e) {
+            // Log lỗi ra console hoặc file log
+            e.printStackTrace();
+
+            // Trả về lỗi 500 với thông báo chi tiết hơn
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("An error occurred while fetching products: " + e.getMessage());
+        }
     }
 
     // Tìm kiếm sản phẩm theo tên

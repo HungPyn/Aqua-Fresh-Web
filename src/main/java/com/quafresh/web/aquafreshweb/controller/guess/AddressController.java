@@ -25,17 +25,22 @@ public class AddressController {
         return provinceService.getAllProvince();
     }
 
-    @PostMapping("/district")
-    public ResponseEntity<List<District>> getDistrictByProvinceId(@RequestBody IdRequest id){
+//    @PostMapping("/district")
+//    public ResponseEntity<List<District>> getDistrictByProvinceId(@RequestBody IdRequest id){
+//        return districtService.getDistrictByProvinceId(id);
+//    }
+    @GetMapping("/district")
+    public ResponseEntity<List<District>> getDistrictByProvinceId(@RequestParam Integer id){
         return districtService.getDistrictByProvinceId(id);
     }
 
-    @PostMapping("/ward")
-    public ResponseEntity<List<Ward>> getWardByDistrictId(@RequestBody IdRequest id){
+//    @PostMapping("/ward")
+//    public ResponseEntity<List<Ward>> getWardByDistrictId(@RequestBody IdRequest id){
+//        return wardService.getWardByDistrictId(id);
+//    }
+    @GetMapping("/ward")
+    public  ResponseEntity<List<Ward>> getWard(@RequestParam Integer id){
         return wardService.getWardByDistrictId(id);
     }
-    @GetMapping("/ward")
-    public  ResponseEntity<Ward> getWard(@RequestBody IdRequest id){
-        return wardService.getWard(id);
-    }
+
 }

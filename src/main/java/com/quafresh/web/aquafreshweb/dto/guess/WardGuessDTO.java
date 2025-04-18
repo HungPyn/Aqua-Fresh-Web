@@ -1,7 +1,9 @@
 package com.quafresh.web.aquafreshweb.dto.guess;
 
 import com.quafresh.web.aquafreshweb.entity.Ward;
+import lombok.Getter;
 
+@Getter
 public class WardGuessDTO {
     private Integer id;
     private String WardName;

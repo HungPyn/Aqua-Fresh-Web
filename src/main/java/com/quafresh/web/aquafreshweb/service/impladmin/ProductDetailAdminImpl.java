@@ -40,7 +40,7 @@ public class ProductDetailAdminImpl implements ProductDetailAdminService {
     @Override
     public List<ProductDetailAdminDTO> search(String keyword) {
 
-        List<ProductDetail> listProductDetail = productDetailRepository.findByProductName(keyword);
+        List<ProductDetail> listProductDetail = productDetailRepository.searchByProductName(keyword);
         return listProductDetail.stream().map(adminMapper::toProductDetailAdminDTO).collect(Collectors.toList());
     }
 

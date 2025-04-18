@@ -59,9 +59,9 @@ public class ProductDetailImpl implements ProductDetailService {
 
     }
 
-    @Override
-    public List<ProductDetailAdminDTO> searchByProductName(String keyword) {
-        List<ProductDetail> listSearch = productDetailRepository.findByProductName(keyword);
-        return  listSearch.stream().map(p->adminMapper.toProductDetailAdminDTO(p)).collect(Collectors.toList());
-    }
+//    @Override
+//    public List<ProductDetailAdminDTO> searchByProductName(String keyword) {
+//        List<ProductDetail> listSearch = productDetailRepository.findByProductName(keyword);
+//        return  listSearch.stream().map(p->adminMapper.toProductDetailAdminDTO(p)).collect(Collectors.toList());
+//    }
 }

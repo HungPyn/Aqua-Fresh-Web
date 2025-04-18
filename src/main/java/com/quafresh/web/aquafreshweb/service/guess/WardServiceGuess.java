@@ -7,6 +7,6 @@ import org.springframework.http.ResponseEntity;
 import java.util.List;
 
 public interface WardServiceGuess {
-    public ResponseEntity<List<Ward>> getWardByDistrictId(IdRequest id);
-    public ResponseEntity<Ward> getWard(IdRequest id);
+    public ResponseEntity<List<Ward>> getWardByDistrictId(Integer id);
+    public ResponseEntity<Ward> getWard(Integer id);
 }

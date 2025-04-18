@@ -12,5 +12,5 @@ public interface ProductDetailService {
     public ResponseEntity<List<ProductDetail>> getAll();
     public ProductDetailGuessDTO2 getById(Integer id);
     List<BestSellingProductDTO> getBestSellingProducts();
-    List<ProductDetailAdminDTO> searchByProductName(String productName);
+//    List<ProductDetailAdminDTO> searchByProductName(String productName);
 }

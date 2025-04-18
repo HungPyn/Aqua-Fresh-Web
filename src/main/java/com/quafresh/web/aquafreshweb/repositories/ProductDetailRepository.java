@@ -16,9 +16,9 @@ import java.util.List;
 @Repository
 public interface ProductDetailRepository extends JpaRepository<ProductDetail, Integer> {
     @Query("SELECT pd FROM ProductDetail pd WHERE pd.codeProductDetail LIKE %:name%")
-    List<ProductDetailAdminDTO> searchByProductName(@Param("keyword") String keyword);
+    List<ProductDetail> searchByProductName(@Param("keyword") String keyword);
 
-    List<ProductDetail> findByProductName(@Param("name") String name);
+//    List<ProductDetail> findByProductName(@Param("name") String name);
     @Query("""
     SELECT pd 
     FROM OrderDetail od 
