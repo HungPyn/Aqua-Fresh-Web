@@ -9,11 +9,14 @@ import HoaDonAdmin from "@/page/viewAdmin/HoaDonAdmin.vue";
 import ProductAdmin from "@/page/viewAdmin/ProductAdmin.vue";
 import UserAdmin from "@/page/viewAdmin/UserAdmin.vue";
 import ProductDetail from "@/components/ProductDetail.vue";
-import HomeAdmin from "@/page/viewAdmin/HomeAdmin.vue";
 import Login from "@/page/Login.vue";
 import TimKiem from "@/components/TimKiem.vue";
 import DonHang from "@/page/view/DonHang.vue";
 import ThanhToan from "@/components/ThanhToan.vue";
+import CategoryAdmin from "@/page/viewAdmin/CategoryAdmin.vue";
+import ColorsAdmin from "@/page/viewAdmin/ColorsAdmin.vue";
+import CompanyAdmin from "@/page/viewAdmin/CompanyAdmin.vue";
+import TechnologyAdmin from "@/page/viewAdmin/TechnologyAdmin.vue";
 
 const routes = [
   { path: "/", redirect: "/home" }, // Chuyển hướng mặc định
@@ -21,17 +24,35 @@ const routes = [
   { path: "/timKiem", name: "timKiem", component: TimKiem },
   { path: "/donHang", name: "donHang", component: DonHang },
   { path: "/thanhToan", name: "thanhToan", component: ThanhToan },
-  { path: "/homeAdmin", name: "homeAdmin", component: HomeAdmin },
   { path: "/login", name: "login", component: Login },
   { path: "/discount", name: "discount", component: Discount },
   { path: "/gioHang", name: "gioHang", component: GioHang },
   { path: "/whishlist", name: "whishlist", component: Whisthlist },
-  { path: "/userAdmin", name: "userAdmin", component: UserAdmin },
-  { path: "/productAdmin", name: "productAdmin", component: ProductAdmin },
-  { path: "/hoaDonAdmin", name: "hoaDonAdmin", component: HoaDonAdmin },
-  { path: "/donHangAdmin", name: "donHangAdmin", component: DonHangAdmin },
-  { path: "/discountAdmin", name: "discountAdmin", component: DiscountAdmin },
+
   { path: "/:pathMatch(.*)*", redirect: "/home" },
+
+  //admin
+  { path: "/discount-admin", name: "discount-admin", component: DiscountAdmin },
+  { path: "/customer-admin", name: "customer-admin", component: UserAdmin },
+  { pahth: "/product-admin", name: "product-admin", component: ProductAdmin },
+  { path: "/color-admin", name: "color-admin", component: ColorsAdmin },
+  { path: "/company-admin", name: "company-admin", component: CompanyAdmin },
+  { path: "/category-admin", name: "category-admin", component: CategoryAdmin },
+  {
+    path: "/technogoly-admin",
+    name: "technogoly-admin",
+    component: TechnologyAdmin,
+  },
+  {
+    path: "/invoice-admin",
+    name: "product-detail-admin",
+    component: HoaDonAdmin,
+  },
+  {
+    path: "/order-admin",
+    name: "order-admin",
+    component: DonHangAdmin,
+  },
   {
     path: "/productDetail/:id", // Định nghĩa route có tham số ":id"
     name: "ProductDetail",

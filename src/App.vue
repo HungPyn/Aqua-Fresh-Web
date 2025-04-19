@@ -14,5 +14,4 @@ import HeaderLayout from "./layout/HeaderLayout.vue";
 import Login from "./page/Login.vue";
 import DangNhap from "./page/view/DangNhap.vue";
 import Home from "./page/view/Home.vue";
-import HomeAdmin from "./page/viewAdmin/HomeAdmin.vue";
 </script>
