@@ -16,7 +16,6 @@ import java.util.List;
 public class OrderController {
     private final OderGuessImpl orOderGuess;
     //Oder khi co User
-
     @PostMapping
     public ResponseEntity<String> addOrder (@RequestBody OrderDetailClientDTO orderDetailClientDTO){
         return  orOderGuess.addOrder(orderDetailClientDTO);
@@ -24,5 +23,9 @@ public class OrderController {
     @GetMapping("/{id}")
     public ResponseEntity<List<OrderDetailClientDTO>> getAllOrderTableById(@PathVariable Integer id){
         return orOderGuess.getAll(id);
+    }
+    @PostMapping("/{id}")
+    public ResponseEntity<String> deleteOrderIfPending(@PathVariable Integer id){
+        return orOderGuess.deleteOrderIfPending(id);
     }
 }
