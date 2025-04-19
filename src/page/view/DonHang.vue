@@ -1,112 +1,117 @@
 <template>
-  <div class="container mt-4">
-    <!-- Tiêu đề -->
+  <div
+    class="mt-4"
+    style="max-width: 1000px; margin: 0 auto; font-size: 0.85rem"
+  >
+    <h1 class="mb-4 text-center">Đơn Hàng</h1>
 
-    <h1 class="mb-4">Đơn Hàng</h1>
-
-    <!-- Kiểm tra nếu không có đơn hàng -->
-    <div v-if="donHang.length === 0" class="alert alert-info">
+    <div v-if="donHang.length === 0" class="alert alert-info text-center">
       Bạn chưa có đơn hàng nào.
     </div>
-    <!-- Danh sách các đơn hàng -->
+
     <div v-if="donHang.length > 0">
       <div
-        v-for="dh in orders"
+        v-for="dh in donHang"
         :key="dh.id"
-        class="card mb-4 shadow-lg border-primary rounded-lg"
-        style="transition: transform 0.3s ease, box-shadow 0.3s ease"
+        class="card mb-4 border-primary rounded-lg shadow-lg"
+        style="transition: transform 0.2s ease, box-shadow 0.2s ease"
         @mouseover="hover = true"
         @mouseleave="hover = false"
-        :class="{ 'shadow-xl': hover }"
+        :class="{ shadow: hover }"
       >
         <div class="card-body">
-          <div class="d-flex justify-content-between align-items-center">
-            <div>
-              <!-- Trạng thái đơn hàng với màu đỏ -->
-              <p>
-                <strong class="font-weight-bold">Trạng thái: </strong>
-                <span class="text-warning"
-                  ><b>{{ dh.status }}</b></span
-                >
+          <div class="d-flex justify-content-between flex-wrap">
+            <div class="mb-2">
+              <p class="mb-1">
+                <strong>Trạng thái: </strong>
+                <span style="font-size: 15px; font-weight: bold"
+                  ><b v-if="dh.status == 'CHỜ_XỬ_LÝ'" class="text-danger">
+                    Chờ Xử lý
+                  </b>
+                  <b v-if="dh.status == 'ĐANG_GIAO'" class="text-warning">
+                    Đang giao
+                  </b>
+                  <b v-if="dh.status == 'HOÀN_THÀNH'" class="text-success">
+                    Hoàn thành
+                  </b>
+                </span>
               </p>
-              <p>
+              <p class="mb-1">
                 <strong>Ngày đặt:</strong> {{ new Date().toLocaleString() }}
               </p>
             </div>
-            <div>
-              <!-- Tổng tiền với màu đỏ -->
-              <p>
-                <strong class="font-weight-bold">Tổng tiền: </strong>
-                <span class="total-price">
-                  <b class="text-danger"
-                    >{{ formatCurrency(dh.total) }} đ</b
-                  ></span
-                >
+            <div class="text-end mb-2">
+              <p class="mb-1">
+                <strong>Tổng thanh toán: </strong>
+                <b class="text-danger">{{ formatCurrency(dh.total) }} đ</b>
               </p>
-              <!-- Phí vận chuyển với màu đỏ -->
-              <p>
-                <strong class="font-weight-bold">Phí vận chuyển: </strong>
-                <b class="text-danger"
-                  >{{ formatCurrency(dh.shippingPrice) }} đ</b
+              <p class="mb-1">
+                <strong>Phí vận chuyển: </strong>
+                <label class="text-danger"
+                  >{{ formatCurrency(dh.shippingPrice) }} đ</label
                 >
               </p>
             </div>
           </div>
+
+          <hr />
 
           <!-- Chi tiết sản phẩm -->
           <div
-            v-for="item in donHang.detailGuessDTOList"
+            v-for="item in dh.detailGuessDTOList"
             :key="item.productDetailId"
-            class="row mb-3 product-detail"
+            class="d-flex align-items-center mb-2 small"
+            style="border-bottom: 1px solid #eee; padding-bottom: 6px"
           >
-            <hr />
-            <div class="col-md-2 text-center">
+            <router-link :to="'/productDetail/' + item.productDetailId">
               <img
-                :src="item.ListImage[0]"
-                class="img-fluid"
-                alt="Product Image"
+                :src="item.urlImage"
+                alt="Product"
                 style="
-                  width: 100px;
-                  height: 100px;
-                  border-radius: 5px;
-                  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-                  transition: transform 0.2s ease;
+                  width: 110px;
+                  height: 80px;
+                  object-fit: cover;
+                  border-radius: 4px;
+                  margin-right: 10px;
+                  margin-right: 35px; /* Tăng khoảng cách giữa ảnh và nội dung */
                 "
-                @mouseover="item.hover = true"
-                @mouseleave="item.hover = false"
-                :style="{ transform: item.hover ? 'scale(1.1)' : 'scale(1)' }"
               />
+            </router-link>
+            <div class="flex-grow-1">
+              <router-link
+                class="product-link"
+                :to="'/productDetail/' + item.productDetailId"
+              >
+                <div>
+                  <strong style="font-size: 16px">{{
+                    item.productName
+                  }}</strong>
+                </div>
+                <div>
+                  Số lượng: <b>{{ item.quantity }}</b> | Giá:
+                  <span class="text-danger"
+                    >{{ formatCurrency(item.price) }} đ</span
+                  >
+                </div>
+              </router-link>
             </div>
-            <div class="col-md-6">
-              <p>
-                Sản phẩm:
-                <strong
-                  >Máy lọc nước gầm tủ AQUA 7 cấp lọc có khả năng hút, bơm sâu
-                  đến 3 mét. Đây là một trong những sản phẩm có thể khắc phục
-                  tốt việc hút từ những nơi có áp lực nước khá yếu, hay hút dưới
-                  bể ngầm.</strong
-                >
-              </p>
-              <p>
-                <strong>Giá: </strong>
-                <b class="text-danger">{{ formatCurrency(item.price) }} đ</b>
-              </p>
-              <p><strong>Số lượng:</strong> {{ item.quantity }}</p>
-            </div>
-            <div class="col-md-4 text-center">
-              <p>
-                <strong>Tổng: </strong>
-                <b class="text-danger">
-                  {{ formatCurrency(item.price * item.quantity) }} đ</b
-                >
+            <div class="text-end ms-5">
+              <p class="mb-0">
+                Tổng:
+                <label class="text-danger">
+                  {{ formatCurrency(item.price * item.quantity) }} đ
+                </label>
               </p>
             </div>
           </div>
 
-          <!-- Tình trạng đơn hàng -->
-          <div class="d-flex justify-content-end">
-            <button class="btn btn-outline-primary btn-sm update-status-btn">
-              Cập nhật trạng thái
+          <div class="d-flex justify-content-end mt-3">
+            <button
+              v-show="dh.status == 'CHỜ_XỬ_LÝ'"
+              class="btn btn-outline-danger btn-sm"
+              @click="huyDon(dh)"
+            >
+              Hủy đơn hàng
             </button>
           </div>
         </div>
@@ -190,22 +195,31 @@ const formatCurrency = (value) => {
 //ghép ảnh voa fodon hang
 const setDonHang = () => {
   // Gắn ảnh vào đơn hàng
+
   try {
     donHang.value.forEach((dh) => {
       dh.detailGuessDTOList.forEach((detail) => {
-        const matchingImages = picture.value
-          .filter((img) => img.productDetailIdl === detail.productDetailId)
-          .map((img) => img.urlImage);
+        const matchingImage = picture.value.find(
+          (img) => img.productDetailIdl === detail.productDetailId
+        );
 
-        detail.ListImage = matchingImages; // Gắn mảng ảnh
+        // Gán urlImage nếu tìm thấy
+        detail.urlImage = matchingImage ? matchingImage.urlImage : null;
       });
     });
-    console.log(
-      "Đơn hàng sau khi gán ảnh:",
-      JSON.stringify(donHang.value, null, 2)
-    );
   } catch (error) {
-    console.error("Lỗi khi gán ảnh vào đơn hàng:", error);
+    console.error("Lỗi khi gán ảnh:", error);
+  }
+  console.log(
+    "Đơn hàng sau khi gán ảnh:",
+    JSON.stringify(donHang.value, null, 2)
+  );
+};
+
+//huy don hang
+const huyDon = async (id) => {
+  if (isLogin.value) {
+    toast.info("xóa thành công");
   }
 };
 onMounted(async () => {
@@ -230,6 +244,15 @@ onMounted(async () => {
 }
 .product-detail img:hover {
   transform: scale(1.1);
+}
+.product-link {
+  text-decoration: none; /* Loại bỏ gạch chân */
+  color: inherit; /* Thừa hưởng màu chữ từ phần tử cha */
+}
+
+.product-link:hover {
+  text-decoration: underline; /* Chỉ gạch chân khi hover */
+  color: inherit; /* Giữ nguyên màu chữ khi hover */
 }
 
 /* Button Hover effect */

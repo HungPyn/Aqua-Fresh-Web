@@ -766,7 +766,7 @@ const XacNhanThanhToan = async () => {
           soLuong.value +
         responeGiaShip.value.data.total,
       idUser: user.value.id,
-      status: "PENDING",
+      status: "CHỜ_XỬ_LÝ",
       shippingPrice: responeGiaShip.value.data.total,
       detailGuessDTOList: detailGuessDTOList,
     };
