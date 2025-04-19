@@ -1,30 +1,50 @@
 import axios from "axios";
 
-// Base path riêng cho các API liên quan đến order
-const BASE_URL = "/admin/ordertable";
+const BASE_URL = "http://localhost:8080/admin/ordertable";
 
-// API key hoặc token có thể lấy từ localStorage hoặc bất kỳ đâu
-const token = localStorage.getItem("token");
-
-const headers = {
-  Authorization: `Bearer ${token}`,
+// Hàm lấy header với token
+const getAuthHeader = () => {
+  const token = localStorage.getItem("token");
+  if (!token) {
+    throw new Error("Token không hợp lệ hoặc không tồn tại");
+  }
+  return {
+    Authorization: `Bearer ${token}`,
+    "Content-Type": "application/json",
+  };
 };
 
 const OrderService = {
-  getAllOrders() {
-    return axios.get(`${BASE_URL}`, { headers });
+  // Lấy tất cả các đơn hàng
+  getAll: async () => {
+    const res = await axios.get(BASE_URL, {
+      headers: getAuthHeader(),
+    });
+    return res.data;
   },
 
-  updateOrder(id, orderData) {
-    return axios.put(`${BASE_URL}/update/${id}`, orderData, { headers });
+  // Cập nhật thông tin đơn hàng
+  updateOrder: async (id, orderData) => {
+    const res = await axios.put(`${BASE_URL}/update/${id}`, orderData, {
+      headers: getAuthHeader(),
+    });
+    return res.data;
   },
 
-  getOrderById(id) {
-    return axios.get(`${BASE_URL}/${id}`, { headers });
+  // Lấy đơn hàng theo ID
+  getOrderById: async (id) => {
+    const res = await axios.get(`${BASE_URL}/${id}`, {
+      headers: getAuthHeader(),
+    });
+    return res.data;
   },
 
-  deleteOrder(id) {
-    return axios.delete(`${BASE_URL}/delete/${id}`, { headers });
+  // Xóa đơn hàng
+  deleteOrder: async (id) => {
+    const res = await axios.delete(`${BASE_URL}/delete/${id}`, {
+      headers: getAuthHeader(),
+    });
+    return res.data;
   },
 };
 

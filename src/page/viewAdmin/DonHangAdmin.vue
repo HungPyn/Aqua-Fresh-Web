@@ -70,8 +70,8 @@
 
 <script setup>
 import { ref, onMounted } from "vue";
-import axios from "axios";
 import { useToast } from "vue-toastification";
+import OrderService from "@/services/OrderTableService.js";
 
 const toast = useToast();
 const orders = ref([]);
@@ -80,10 +80,11 @@ const searchPhone = ref("");
 // Gọi API lấy tất cả đơn hàng
 const fetchOrders = async () => {
   try {
-    const res = await axios.get("/admin/ordertable");
-    orders.value = res.data;
+    const data = await OrderService.getAll();
+    orders.value = data;
   } catch (err) {
     toast.error("Lỗi khi tải danh sách đơn hàng");
+    console.error(err);
   }
 };
 
@@ -94,12 +95,11 @@ const searchOrder = async () => {
     return;
   }
   try {
-    const res = await axios.get("/admin/ordertable/search", {
-      params: { phone: searchPhone.value },
-    });
-    orders.value = res.data;
+    const data = await OrderService.searchByPhone(searchPhone.value);
+    orders.value = data;
   } catch (err) {
     toast.error("Không tìm thấy đơn hàng");
+    console.error(err);
   }
 };
 
@@ -107,22 +107,24 @@ const searchOrder = async () => {
 const deleteOrder = async (id) => {
   if (!confirm("Bạn có chắc muốn xóa đơn hàng này?")) return;
   try {
-    await axios.delete(`/admin/ordertable/delete/${id}`);
+    await OrderService.delete(id);
     toast.success("Xóa đơn hàng thành công");
     fetchOrders();
   } catch (err) {
     toast.error("Xóa thất bại");
+    console.error(err);
   }
 };
 
 // Cập nhật trạng thái đơn hàng
 const updateStatus = async (order) => {
   try {
-    await axios.put(`/admin/ordertable/update/${order.id}`, order);
+    await OrderService.update(order.id, order);
     toast.success("Cập nhật trạng thái thành công");
     fetchOrders();
   } catch (err) {
     toast.error("Cập nhật thất bại");
+    console.error(err);
   }
 };
 
