@@ -13,9 +13,12 @@ public class OrderDetailGuessDTO {
     private BigDecimal price;
     private Integer quantity;
     private Integer productDetailId;
+    private String productName;
+    private String urlImage;
     public OrderDetailGuessDTO(OrderDetail orderDetail) {
         this.productDetailId = orderDetail.getIdProductDetail().getId();
         this.quantity = orderDetail.getQuantity();
         this.price = orderDetail.getPrice();
+        this.productName = orderDetail.getIdProductDetail().getIdProduct().getProductName();
     }
 }
