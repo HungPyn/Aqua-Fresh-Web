@@ -40,27 +40,40 @@
           <td>{{ formatCurrency(order.total) }}</td>
           <td>{{ formatCurrency(order.shippingPrice) }}</td>
           <td>
-            <select v-model="order.status" class="form-select form-select-sm">
-              <option value="CHỜ_XỬ_LÝ">Chờ xử lý</option>
-              <option value="ĐANG_GIAO">Đang giao</option>
-              <option value="HOÀN_THÀNH">Hoàn thành</option>
-              <option value="HUỶ">Đã huỷ</option>
-            </select>
+            <div v-if="order.status === 'CHỜ_XỬ_LÝ'">
+              <select v-model="order.status" class="form-select form-select-sm">
+                <option value="CHỜ_XỬ_LÝ">Chờ xử lý</option>
+                <option value="ĐANG_GIAO">Đang giao</option>
+                <option value="HOÀN_THÀNH">Hoàn thành</option>
+                <option value="HUỶ">Đã huỷ</option>
+              </select>
+            </div>
+            <div v-else>{{ order.status.replaceAll("_", " ") }}</div>
           </td>
           <td>
-            <button
-              class="btn btn-success btn-sm me-2"
-              @click="updateStatus(order)"
-            >
-              Cập nhật
-            </button>
-            <button
-              class="btn btn-danger btn-sm"
-              @click="deleteOrder(order.id)"
-              :disabled="order.status !== 'CHỜ_XỬ_LÝ'"
-            >
-              Xóa
-            </button>
+            <template v-if="order.status === 'CHỜ_XỬ_LÝ'">
+              <button
+                class="btn btn-success btn-sm me-2"
+                @click="updateStatus(order)"
+              >
+                Cập nhật
+              </button>
+              <button
+                class="btn btn-danger btn-sm"
+                @click="deleteOrder(order.id)"
+              >
+                Xóa
+              </button>
+            </template>
+            <template v-else>
+              <button
+                class="btn btn-outline-primary btn-sm"
+                @click="viewOrder(order)"
+                title="Xem chi tiết"
+              >
+                👁
+              </button>
+            </template>
           </td>
         </tr>
       </tbody>
@@ -77,7 +90,7 @@ const toast = useToast();
 const orders = ref([]);
 const searchPhone = ref("");
 
-// Gọi API lấy tất cả đơn hàng
+// Lấy tất cả đơn hàng
 const fetchOrders = async () => {
   try {
     const data = await OrderService.getAll();
@@ -128,6 +141,13 @@ const updateStatus = async (order) => {
   }
 };
 
+// Xem chi tiết đơn hàng
+const viewOrder = (order) => {
+  toast.info(`Xem chi tiết đơn hàng #${order.id}`);
+  // Nếu có router detail page thì có thể dùng:
+  // router.push(`/admin/orders/${order.id}`)
+};
+
 // Định dạng ngày
 const formatDate = (isoString) => {
   const date = new Date(isoString);
@@ -146,6 +166,7 @@ onMounted(() => {
   fetchOrders();
 });
 </script>
+
 <style scoped>
 .container {
   max-width: 1200px;
