@@ -166,7 +166,7 @@
         </a>
 
         <!-- Nút Facebook -->
-        <a href="https://www.facebook.com/vuong04321" target="_blank">
+        <a href="" target="_blank">
           <img
             src="../../img/2021_Facebook_icon.svg.png"
             alt="Facebook"
