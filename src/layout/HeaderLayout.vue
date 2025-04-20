@@ -44,7 +44,7 @@
           </div>
 
           <a
-            href="https://www.facebook.com/vuong04321"
+            href=""
             class="link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"
           >
             <img

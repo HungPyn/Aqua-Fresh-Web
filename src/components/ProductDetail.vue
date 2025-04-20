@@ -145,17 +145,10 @@
         </div>
       </div>
       <br />
-      <div class="row g-2">
+      <div class="row g-2" v-if="productTuongTu.length > 0">
         <h5 class="fw-semibold mt-3 text-secondary">Các sản phẩm tương tự</h5>
         <div
-          v-for="pd in productFull
-            .filter(
-              (pd) =>
-                pd.idProduct.idCategory.id == product.idProduct.idCategory.id &&
-                pd.id !== product.id
-            )
-            .sort(() => Math.random() - 0.5)
-            .slice(0, 4)"
+          v-for="pd in productTuongTu"
           :key="pd.id"
           class="col-12 col-md-3 mb-4"
         >
@@ -169,7 +162,7 @@
             >
               <!-- Hình ảnh -->
               <img
-                :src="pd.images[0]"
+                :src="pd.listUrl[0].urlImage"
                 class="img-fluid"
                 style="height: 245px; margin: 10px"
               />
@@ -675,10 +668,13 @@ const getOneProduct = async () => {
     fullProduct.value = res.data;
     // console.log("product là:", JSON.stringify(fullProduct.value, null, 2));
     product.value = fullProduct.value.productDetail;
+    idCategory.value = fullProduct.value.productDetail.idProduct.idCategory.id;
+    console.log("id category là:", idCategory.value);
   } catch (error) {
     console.error("Lỗi khi gọi 1 product:", error);
   }
 };
+const idCategory = ref(null);
 //sản phảm tương tự
 //get ảnh
 const truncateText = (text, maxLength) => {
@@ -686,58 +682,43 @@ const truncateText = (text, maxLength) => {
   return text.length > maxLength ? text.substring(0, maxLength) + "..." : text;
 };
 
-const getImage = async () => {
-  try {
-    const response = await axios.get("http://localhost:8080/product/picture");
-    images.value = response.data;
-  } catch (error) {
-    console.error("Lỗi lấy ảnh:", error);
-  }
+const productTuongTu = ref([]);
+
+// Hàm lọc mảng khcs theo category và lấy 4 sản phẩm
+const filterProducts = (categoryId) => {
+  productTuongTu.value = products.value
+    .filter(
+      (pd) =>
+        pd.idProduct.idCategory.id == categoryId &&
+        pd.idProduct.idCategory.id != product.value.id
+    ) // Lọc theo category
+    .sort(() => Math.random() - 0.5) // Xáo trộn ngẫu nhiên
+    .slice(0, 4); // Lấy 4 sản phẩm đầu tiên
+
+  console.log(
+    "Sản phẩm tương tự là:",
+    JSON.stringify(productTuongTu.value, null, 2)
+  );
 };
 //getproduct
 const getProduct = async () => {
   try {
     const response = await axios.get("http://localhost:8080/product");
-    productNoImage.value = response.data;
+    products.value = response.data;
+    filterProducts(idCategory.value);
+    console.log("Sản phẩm ss là:", JSON.stringify(products.value, null, 2));
   } catch (error) {
     console.error("Lỗi lấy product", error);
   }
 };
 //ghép product full dữ liệu
-const images = ref([]);
-const productNoImage = ref([]);
-const productFull = ref([]);
-const getFullProduct = () => {
-  productNoImage.value.forEach((product) => {
-    // Tìm các ảnh có idproduct trùng với id của sản phẩm
-    const productImages = images.value
-      .filter((image) => image.productDetailIdl === product.id)
-      .map((image) => image.urlImage);
 
-    // Ghép thông tin sản phẩm và các ảnh vào productFull
-    productFull.value.push({
-      ...product, // Thêm thông tin của sản phẩm
-      images: productImages, // Thêm các ảnh tương ứng
-    });
-  });
-};
-
+const products = ref([]);
 onMounted(async () => {
-  try {
-    // Chạy getOneProduct, getImage, getProduct song song
-    const [productData, imageData, productDetails] = await Promise.all([
-      getOneProduct(),
-      getImage(),
-      getProduct(),
-      getTinh(),
-    ]);
-
-    // Sau khi cả 3 async functions đều xong, gọi ghép dữ liệu
-    getFullProduct(productData, imageData, productDetails);
-    getUserFromSession(); // Lấy thông tin người dùng từ sessionStorage
-  } catch (error) {
-    console.error("Lỗi khi tải dữ liệu:", error);
-  }
+  await getOneProduct();
+  await getProduct();
+  getTinh();
+  getUserFromSession();
 });
 //thanh toán
 const XacNhanThanhToan = async () => {
@@ -766,7 +747,7 @@ const XacNhanThanhToan = async () => {
           soLuong.value +
         responeGiaShip.value.data.total,
       idUser: user.value.id,
-      status: "Pending",
+      status: "CHỜ_XỬ_LÝ",
       shippingPrice: responeGiaShip.value.data.total,
       detailGuessDTOList: detailGuessDTOList,
     };
@@ -848,6 +829,8 @@ watch(
   () => props.id,
   () => {
     getOneProduct(); // Khi ID thay đổi, lấy sản phẩm mới
+    filterProducts(idCategory.value); // Lọc lại sản phẩm tương tự
+    soLuong.value = 1; // Đặt lại số lượng về 1
   }
 );
 
