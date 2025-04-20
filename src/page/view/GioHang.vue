@@ -912,7 +912,7 @@ const XacNhanThanhToan = async () => {
     const donHang = {
       total: tongCong.value + responeGiaShip.value.data.total,
       idUser: user.value.id,
-      status: "Pending",
+      status: "CHỜ_XỬ_LÝ",
       shippingPrice: responeGiaShip.value.data.total,
       detailGuessDTOList: detailGuessDTOList,
     };
