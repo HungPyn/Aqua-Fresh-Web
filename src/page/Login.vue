@@ -321,6 +321,7 @@ const dangNhap = async () => {
     );
     const token = res.data;
     localStorage.setItem("token", token);
+    console.log("Token là:", token);
     console.log("Đã lưu token");
     getUser();
     baoLoi.value = false;

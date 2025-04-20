@@ -34,7 +34,7 @@
       <tbody>
         <tr v-for="order in orders" :key="order.id">
           <td>{{ order.id }}</td>
-          <td>{{ order.idUser?.name }}</td>
+          <td>{{ order.idUser?.fullname }}</td>
           <td>{{ order.idUser?.phone }}</td>
           <td>{{ formatDate(order.oderDate) }}</td>
           <td>{{ formatCurrency(order.total) }}</td>

@@ -2,7 +2,7 @@
 import { ref, onMounted } from "vue";
 import { useToast } from "vue-toastification";
 import Swal from "sweetalert2";
-import CustomerService from "@/services/CompanyService.js"; // Đổi đúng path nếu khác
+import CustomerService from "@/services/CustomerService"; // Đổi đúng path nếu khác
 
 const toast = useToast();
 const users = ref([]);
@@ -19,11 +19,7 @@ const newUser = ref({
 const isEdit = ref(false);
 
 const getUsers = async () => {
-  try {
-    users.value = await CustomerService.getAllCustomers();
-  } catch (error) {
-    toast.error("Lỗi khi tải danh sách người dùng");
-  }
+  users.value = await CustomerService.getAllCustomers();
 };
 
 const search = async () => {
