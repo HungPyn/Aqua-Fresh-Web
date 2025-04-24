@@ -1,20 +1,19 @@
 package com.quafresh.web.aquafreshweb.util;
 
-import com.quafresh.web.aquafreshweb.dto.LoginDTO;
 import com.quafresh.web.aquafreshweb.dto.LoginRequestDTO;
 import com.quafresh.web.aquafreshweb.dto.admin.*;
 import com.quafresh.web.aquafreshweb.entity.*;
+import jakarta.persistence.criteria.Order;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
-import org.mapstruct.factory.Mappers;
 
 @Mapper(componentModel = "spring")
-public interface AdminMapper {
+public interface AdminMapper{
 
     @Mappings({@Mapping(source = "productName", target = "name")})
     ProductAdminDTO toProductAdminDTO(Product product);
-
+    OderAdminDTO toOrderAdminDTO(Order order);
     ColorAdminDtO toColorAdminDTO(Color color);
 
     TechnologyAdminDTO toTechnologyAdminDTO(Technology tech);
