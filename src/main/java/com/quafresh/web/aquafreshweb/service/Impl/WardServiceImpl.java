@@ -18,10 +18,12 @@ public class WardServiceImpl implements WardServiceGuess {
     private final WardRepository wardRepository;
     private final DistrictRepository districtRepository;
     @Override
-    public ResponseEntity<List<Ward>> getWardByDistrictId(Integer id) {
-        District district = districtRepository.findById(id).get();
-        return ResponseEntity.ok(wardRepository.findByDistrict(district));
+    public List<Ward> getWardsByDistrictApiId(Integer id) {
+        return wardRepository.findByDistrict_DistrictIdApi(id);
+
     }
+
+
 
     @Override
     public ResponseEntity<Ward> getWard(Integer id) {

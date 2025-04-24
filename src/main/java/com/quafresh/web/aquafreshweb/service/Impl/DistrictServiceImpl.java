@@ -20,13 +20,8 @@ public class DistrictServiceImpl implements DistrictServiceGuess {
     private final DistrictRepository districtRepository;
     private final ProvinceRepository provinceRepository;
     @Override
-    public ResponseEntity<List<District>> getDistrictByProvinceId(Integer provinceId) {
-        Optional<Province> provinceOpt = provinceRepository.findById(provinceId);
-        if (provinceOpt.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-        List<District> districts = districtRepository.findByProvince(provinceOpt.get());
-        return ResponseEntity.ok(districts);
+    public List<District> getDistrictsByProvinceApiId(Integer provinceIdApi) {
+        return districtRepository.findByProvince_ProvinceIdApi(provinceIdApi);
     }
 
 }

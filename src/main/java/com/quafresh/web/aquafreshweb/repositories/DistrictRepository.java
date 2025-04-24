@@ -10,4 +10,7 @@ import java.util.List;
 @Repository
 public interface DistrictRepository extends JpaRepository<District, Integer> {
     public List<District> findByProvince (Province province);
+
+    List<District> findByProvince_ProvinceIdApi(Integer provinceIdApi);
+    ;
 }
