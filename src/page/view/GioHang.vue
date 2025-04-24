@@ -71,7 +71,8 @@
                 >{{
                   Number(
                     item.idProductDetail.price -
-                      item.idProductDetail.idDiscount.discountValue
+                      (item.idProductDetail.idDiscount.discountValue / 100) *
+                        item.idProductDetail.price
                   ).toLocaleString("vi-VN")
                 }}đ</b
               >
@@ -113,8 +114,8 @@
               v-if="item.idProductDetail.idDiscount.discountValue > 0"
               >{{
                 Number(
-                  (item.idProductDetail.price -
-                    item.idProductDetail.idDiscount.discountValue) *
+                  item.idProductDetail.price *
+                    (1 - item.idProductDetail.idDiscount.discountValue / 100) *
                     item.quantity
                 ).toLocaleString("vi-VN")
               }}đ</b
@@ -738,7 +739,7 @@ const tongCong = computed(() => {
     const price = detail.price || 0;
     const quantity = item.quantity || 0;
 
-    return total + (price - discount) * quantity;
+    return total + price * (1 - discount / 100) * quantity;
   }, 0);
 });
 // thanh toán

@@ -79,7 +79,7 @@
         <div class="row g-4">
           <div
             v-for="pd in productFull.filter(
-              (pd) => pd.idProduct.idCategory.id === 1
+              (pd) => pd.idProduct.idCategory.id === 4
             )"
             :key="pd.id"
             class="col-12 col-sm-6 col-md-4 col-lg-3"
@@ -97,13 +97,7 @@
                   class="product-badge"
                   v-if="pd.idDiscount.discountValue > 0"
                 >
-                  <span
-                    >-{{
-                      Math.round(
-                        (pd.idDiscount.discountValue / pd.price) * 100
-                      )
-                    }}%</span
-                  >
+                  <span>-{{ Math.round(pd.idDiscount.discountValue) }}%</span>
                 </div>
                 <div class="product-actions">
                   <button @click.stop="themVaoGio(pd)" class="add-to-cart-btn">
@@ -122,7 +116,7 @@
                   <span class="price-current"
                     >{{
                       Number(
-                        pd.price - pd.idDiscount.discountValue
+                        pd.price * (1 - pd.idDiscount.discountValue / 100)
                       ).toLocaleString("vi-VN")
                     }}
                     ₫</span
@@ -149,7 +143,7 @@
         <div class="row g-4">
           <div
             v-for="pd in productFull.filter(
-              (pd) => pd.idProduct.idCategory.id === 2
+              (pd) => pd.idProduct.idCategory.id === 5
             )"
             :key="pd.id"
             class="col-12 col-sm-6 col-md-4 col-lg-3"
@@ -167,13 +161,7 @@
                   class="product-badge"
                   v-if="pd.idDiscount.discountValue > 0"
                 >
-                  <span
-                    >-{{
-                      Math.round(
-                        (pd.idDiscount.discountValue / pd.price) * 100
-                      )
-                    }}%</span
-                  >
+                  <span>-{{ Math.round(pd.idDiscount.discountValue) }}%</span>
                 </div>
                 <div class="product-actions">
                   <button @click.stop="themVaoGio(pd)" class="add-to-cart-btn">
@@ -192,7 +180,7 @@
                   <span class="price-current"
                     >{{
                       Number(
-                        pd.price - pd.idDiscount.discountValue
+                        pd.price * (1 - pd.idDiscount.discountValue / 100)
                       ).toLocaleString("vi-VN")
                     }}
                     ₫</span
@@ -219,7 +207,7 @@
         <div class="row g-4">
           <div
             v-for="pd in productFull.filter(
-              (pd) => pd.idProduct.idCategory.id === 3
+              (pd) => pd.idProduct.idCategory.id === 6
             )"
             :key="pd.id"
             class="col-12 col-sm-6 col-md-4 col-lg-3"
@@ -237,13 +225,7 @@
                   class="product-badge"
                   v-if="pd.idDiscount.discountValue > 0"
                 >
-                  <span
-                    >-{{
-                      Math.round(
-                        (pd.idDiscount.discountValue / pd.price) * 100
-                      )
-                    }}%</span
-                  >
+                  <span>-{{ Math.round(pd.idDiscount.discountValue) }}%</span>
                 </div>
                 <div class="product-actions">
                   <button @click.stop="themVaoGio(pd)" class="add-to-cart-btn">
@@ -262,7 +244,7 @@
                   <span class="price-current"
                     >{{
                       Number(
-                        pd.price - pd.idDiscount.discountValue
+                        pd.price * (1 - pd.idDiscount.discountValue / 100)
                       ).toLocaleString("vi-VN")
                     }}
                     ₫</span
@@ -305,13 +287,7 @@
                   class="product-badge"
                   v-if="pd.idDiscount.discountValue > 0"
                 >
-                  <span
-                    >-{{
-                      Math.round(
-                        (pd.idDiscount.discountValue / pd.price) * 100
-                      )
-                    }}%</span
-                  >
+                  <span>-{{ Math.round(pd.idDiscount.discountValue) }}%</span>
                 </div>
                 <div class="product-actions">
                   <button @click.stop="themVaoGio(pd)" class="add-to-cart-btn">
@@ -330,7 +306,7 @@
                   <span class="price-current"
                     >{{
                       Number(
-                        pd.price - pd.idDiscount.discountValue
+                        pd.price * (1 - pd.idDiscount.discountValue / 100)
                       ).toLocaleString("vi-VN")
                     }}
                     ₫</span
